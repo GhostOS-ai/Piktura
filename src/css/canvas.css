@@ -1,0 +1,201 @@
+/* ==================== PIKTURA STUDIO — CANVAS & VIEWPORT ==================== */
+.ps-viewport {
+  flex: 1;
+  background: var(--ps-bg-darkest);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Rulers */
+.ruler-corner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  background: var(--ps-bg-dark);
+  border-right: 1px solid var(--ps-border-dark);
+  border-bottom: 1px solid var(--ps-border-dark);
+  font-size: 8.5px;
+  color: var(--ps-text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  font-family: var(--ps-font-mono);
+}
+
+.ruler-horizontal {
+  position: absolute;
+  top: 0;
+  left: 18px;
+  right: 0;
+  height: 18px;
+  background: var(--ps-bg-dark);
+  border-bottom: 1px solid var(--ps-border-dark);
+  z-index: 40;
+  overflow: hidden;
+}
+
+.ruler-vertical {
+  position: absolute;
+  top: 18px;
+  left: 0;
+  bottom: 24px;
+  width: 18px;
+  background: var(--ps-bg-dark);
+  border-right: 1px solid var(--ps-border-dark);
+  z-index: 40;
+  overflow: hidden;
+}
+
+.ruler-horizontal canvas, .ruler-vertical canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* Canvas Scroll Stage */
+.canvas-stage {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  right: 0;
+  bottom: 24px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #141518;
+  cursor: default;
+}
+
+/* The Document Artboard */
+.artboard {
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+  background: transparent;
+  transform-origin: center center;
+  transition: transform 0.05s linear;
+}
+
+/* Classic Photoshop Checkerboard Transparency Pattern */
+.checkerboard-bg {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(45deg, #2b2e38 25%, transparent 25%), 
+    linear-gradient(-45deg, #2b2e38 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #2b2e38 75%), 
+    linear-gradient(-45deg, transparent 75%, #2b2e38 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+  background-color: #1e2029;
+}
+
+/* Container for all stacked layer canvases */
+.layers-container {
+  position: absolute;
+  inset: 0;
+}
+
+.layer-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Selection Marching Ants Overlay */
+.overlay-canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 300;
+}
+
+/* Transform Box with 8 Resize Handles */
+.transform-box {
+  position: absolute;
+  border: 1px solid #3b82f6;
+  pointer-events: auto;
+  z-index: 400;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+.transform-box.hidden {
+  display: none !important;
+}
+
+.handle {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  background: #ffffff;
+  border: 1px solid #1e2025;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  transform: translate(-50%, -50%);
+}
+
+.handle.nw { top: 0; left: 0; cursor: nwse-resize; }
+.handle.n  { top: 0; left: 50%; cursor: ns-resize; }
+.handle.ne { top: 0; left: 100%; cursor: nesw-resize; }
+.handle.w  { top: 50%; left: 0; cursor: ew-resize; }
+.handle.e  { top: 50%; left: 100%; cursor: ew-resize; }
+.handle.sw { top: 100%; left: 0; cursor: nesw-resize; }
+.handle.s  { top: 100%; left: 50%; cursor: ns-resize; }
+.handle.se { top: 100%; left: 100%; cursor: nwse-resize; }
+
+.rotate-handle {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #3b82f6;
+  border: 1px solid #fff;
+  transform: translate(-50%, -50%);
+  cursor: grab;
+}
+
+.rotate-handle::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  width: 1px;
+  height: 16px;
+  background: #3b82f6;
+}
+
+/* Canvas Bottom Status Bar */
+.canvas-status-bar {
+  height: 24px;
+  background: var(--ps-bg-dark);
+  border-top: 1px solid var(--ps-border-dark);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  font-size: 11px;
+  color: var(--ps-text-muted);
+  z-index: 60;
+}
+
+.status-left, .status-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-pill {
+  cursor: pointer;
+}
+
+.status-pill:hover {
+  color: #fff;
+}

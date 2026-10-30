@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Piktura Studio — Professional Creative Suite</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/toolbar.css">
+  <link rel="stylesheet" href="css/options.css">
+  <link rel="stylesheet" href="css/panels.css">
+  <link rel="stylesheet" href="css/canvas.css">
+</head>
+<body class="theme-dark ps-layout">
+
+  <!-- ==================== TOP SYSTEM & APPLICATION MENU BAR ==================== -->
+  <header class="ps-menubar pywebview-drag-region">
+    <div class="menubar-left no-drag">
+      <div class="ps-app-badge" title="Piktura Studio v1.0">
+        <span class="ps-brand-icon">🎨</span>
+        <span class="ps-brand-name">Piktura</span>
+      </div>
+
+      <!-- Native Photoshop Menu Dropdowns -->
+      <nav class="ps-menus">
+        <div class="menu-item" data-menu="file">
+          <span>File</span>
+          <div class="menu-dropdown">
+            <div class="menu-entry" onclick="App.newDocumentDialog()"><span class="label">New...</span><span class="shortcut">⌘N</span></div>
+            <div class="menu-entry" onclick="App.openFileDialog()"><span class="label">Open...</span><span class="shortcut">⌘O</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-entry" onclick="App.saveProject()"><span class="label">Save</span><span class="shortcut">⌘S</span></div>
+            <div class="menu-entry" onclick="App.saveProjectAs()"><span class="label">Save As...</span><span class="shortcut">⇧⌘S</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-entry" onclick="App.exportImage('png')"><span class="label">Quick Export as PNG</span><span class="shortcut">⌥⇧⌘W</span></div>
+            <div class="menu-entry" onclick="App.exportImage('jpeg')"><span class="label">Export as JPEG...</span></div>
+            <div class="menu-entry" onclick="App.exportImage('webp')"><span class="label">Export as WebP...</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-entry" onclick="App.closeDocument()"><span class="label">Close</span><span class="shortcut">⌘W</span></div>
+          </div>
+        </div>
+
+        <div class="menu-item" data-menu="edit">
+          <span>Edit</span>
+          <div class="menu-dropdown">
+            <div class="menu-entry" onclick="History.undo()"><span class="label">Undo</span><span class="shortcut">⌘Z</span></div>
+            <div class="menu-entry" onclick="History.redo()"><span class="label">Redo</span><span class="shortcut">⇧⌘Z</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-entry" onclick="Tools.cut()"><span class="label">Cut</span><span class="shortcut">⌘X</span></div>
+            <div class="menu-entry" onclick="Tools.copy()"><span class="label">Copy</span><span class="shortcut">⌘C</span></div>
+            <div class="menu-entry" onclick="Tools.copyMerged()"><span class="label">Copy Merged</span><span class="shortcut">⇧⌘C</span></div>
+            <div class="menu-entry" onclick="Tools.paste()"><span class="label">Paste</span><span class="shortcut">⌘V</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-entry" onclick="Tools.fill()"><span class="label">Fill...</span><span class="shortcut">⇧F5</span></div>
+            <div class="menu-entry" onclick="Tools.stroke()"><span class="label">Stroke...</span></div>
+            <div class="menu-entry" onclick="Tools.freeTransform()"><span class="label">Free Transform</span><span class="shortcut">⌘T</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-entry" onclick="Tools.clear()"><span class="label">Clear / Delete</span><span class="shortcut">⌫</span></div>
+          </div>
+        </div>
+
+        <div class="menu-item" data-menu="image">
+          <span>Image</span>
+          <div class="menu-dropdown">
+            <div class="menu-entry sub">
+              <span class="label">Adjustments</span>
+              <div class="submenu">
+                <div class="menu-entry" onclick="Filters.showBrightnessContrast()"><span class="label">Brightness / Contrast...</span></div>
+                <div class="menu-entry" onclick="Filters.showLevels()"><span class="label">Levels...</span><span class="shortcut">⌘L</span></div>
+                <div class="menu-entry" onclick="Filters.showCurves()"><span class="label">Curves...</span><span class="shortcut">⌘M</span></div>
+                <div class="menu-entry" onclick="Filters.showHueSaturation()"><span class="label">Hue / Saturation...</span><span class="shortcut">⌘U</span></div>
+                <div class="menu-entry" onclick="Filters.showExposure()"><span class="label">Exposure...</span></div>
+                <div class="menu-divider"></div>
+                <div class="menu-entry" onclick="Filters.invert()"><span class="label">Invert</span><span class="shortcut">⌘I</span></div>
+                <div class="menu-entry" onclick="Filters.desaturate()"><span class="label">Desaturate</span><span class="shortcut">⇧⌘U</span></div>
+                <div class="menu-entry" onclick="Filters.autoTone()"><span class="label">Auto Tone</span><span class="shortcut">⇧⌘L</span></div>
+              </div>
+            </div>
+            <div class="menu-divider"></div>
+            <div class="menu-entry" onclick="App.showImageSizeDialog()"><span class="label">Image Size...</span><span class="shortcut">⌥⌘I</span></div>
+            <div class="menu-entry" onclick="App.showCanvasSizeDialog()"><span class="label">Canvas Size...</span><span class="shortcut">⌥⌘C</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-entry" onclick="Canvas.rotate(90)"><span class="label">Rotate 90° Clockwise</span></div>
+            <div class="menu-entry" onclick="Canvas.rotate(-90)"><span class="label">Rotate 90° Counter-Clockwise</span></div>
+            <div class="menu-entry" onclick="Canvas.rotate(180)"><span class="label">Rotate 180°</span></div>
+            <div class="menu-entry" onclick="Canvas.flipHorizontal()"><span class="label">Flip Canvas Horizontal</span></div>
+            <div class="menu-entry" onclick="Canvas.flipVertical()"><span class="label">Flip Canvas Vertical</span></div>
+          </div>
+        </div>
+
+        <div class="menu-item" data-menu="layer">
+          <span>Layer</span>
+          <div class="menu-dropdown">
+            <div class="menu-entry" onclick="Layers.createLayer()"><span class="label">New Layer</span><span class="shortcut">⇧⌘N</span></div>
+            <div class="menu-entry" onclick="Layers.duplicateActiveLayer()"><span class="label">Duplicate Layer...</span><span class="shortcut">⌘J</span></div>
+            <div class="menu-entry" onclick="Layers.deleteActiveLayer()"><span class="label">Delete Layer</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-entry" onclick="Layers.createClippingMask()"><span class="label">Create Clipping Mask</span><span class="shortcut">⌥⌘G</span></div>
+            <div class="menu-entry" onclick="Layers.releaseClippingMask()"><span class="label">Release Clipping Mask</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-entry" onclick="Layers.createLayerMask()"><span class="label">Add Layer Mask</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-entry" onclick="Layers.mergeDown()"><span class="label">Merge Down</span><span class="shortcut">⌘E</span></div>
+            <div class="menu-entry" onclick="Layers.mergeVisible()"><span class="label">Merge Visible</span><span class="shortcut">⇧⌘E</span></div>
+            <div class="menu-entry" onclick="Layers.flattenImage()"><span class="label">Flatten Image</span></div>
+          </div>
+        </div>
+
+        <div class="menu-item" data-menu="select">
+          <span>Select</span>
+          <div class="menu-dropdown">
+            <div class="menu-entry" onclick="Selection.selectAll()"><span class="label">All</span><span class="shortcut">⌘A</span></div>
+            <div class="menu-entry" onclick="Selection.deselect()"><span class="label">Deselect</span><span class="shortcut">⌘D</span></div>
+            <div class="menu-entry" onclick="Selection.inverse()"><span class="label">Inverse</span><span class="shortcut">⇧⌘I</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-entry" onclick="Selection.selectSubjectAI()"><span class="label">✨ Select Subject (CoreML AI)</span></div>
+            <div class="menu-entry" onclick="Selection.removeBackgroundAI()"><span class="label">✨ Remove Background (AI)</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-entry" onclick="Selection.showFeatherDialog()"><span class="label">Feather...</span><span class="shortcut">⇧F6</span></div>
+          </div>
+        </div>
+
+        <div class="menu-item" data-menu="filter">
+          <span>Filter</span>
+          <div class="menu-dropdown">
+            <div class="menu-entry" onclick="Filters.gaussianBlur(8)"><span class="label">Gaussian Blur...</span></div>
+            <div class="menu-entry" onclick="Filters.motionBlur(12, 0)"><span class="label">Motion Blur...</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-entry" onclick="Filters.sharpen()"><span class="label">Sharpen</span></div>
+            <div class="menu-entry" onclick="Filters.unsharpMask()"><span class="label">Unsharp Mask...</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-entry" onclick="Filters.addNoise(15)"><span class="label">Add Noise...</span></div>
+            <div class="menu-entry" onclick="Filters.pixelateMosaic(10)"><span class="label">Pixelate (Mosaic)...</span></div>
+            <div class="menu-entry" onclick="Filters.findEdges()"><span class="label">Find Edges</span></div>
+          </div>
+        </div>
+
+        <div class="menu-item" data-menu="view">
+          <span>View</span>
+          <div class="menu-dropdown">
+            <div class="menu-entry" onclick="Canvas.zoomIn()"><span class="label">Zoom In</span><span class="shortcut">⌘+</span></div>
+            <div class="menu-entry" onclick="Canvas.zoomOut()"><span class="label">Zoom Out</span><span class="shortcut">⌘-</span></div>
+            <div class="menu-entry" onclick="Canvas.fitToScreen()"><span class="label">Fit on Screen</span><span class="shortcut">⌘0</span></div>
+            <div class="menu-entry" onclick="Canvas.actualPixels()"><span class="label">100% (Actual Pixels)</span><span class="shortcut">⌘1</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-entry" onclick="Canvas.toggleRulers()"><span class="label">Rulers</span><span class="shortcut">⌘R</span></div>
+            <div class="menu-entry" onclick="Canvas.toggleGrid()"><span class="label">Pixel Grid</span><span class="shortcut">⌘'</span></div>
+          </div>
+        </div>
+
+        <div class="menu-item" data-menu="window">
+          <span>Window</span>
+          <div class="menu-dropdown">
+            <div class="menu-entry" onclick="Panels.toggle('layers')"><span class="label">Layers</span><span class="shortcut">F7</span></div>
+            <div class="menu-entry" onclick="Panels.toggle('history')"><span class="label">History</span></div>
+            <div class="menu-entry" onclick="Panels.toggle('color')"><span class="label">Color & Swatches</span></div>
+            <div class="menu-entry" onclick="Panels.toggle('properties')"><span class="label">Properties</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-entry" onclick="App.resetWorkspaceLayout()"><span class="label">Reset Essentials Workspace</span></div>
+          </div>
+        </div>
+
+        <div class="menu-item" data-menu="help">
+          <span>Help</span>
+          <div class="menu-dropdown">
+            <div class="menu-entry" onclick="App.showAboutModal()"><span class="label">About Piktura Studio...</span></div>
+            <div class="menu-entry" onclick="App.showShortcutsModal()"><span class="label">Keyboard Shortcuts Cheat Sheet</span></div>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Drag Spacer in center of Menubar -->
+    <div class="menubar-drag-spacer pywebview-drag-region"></div>
+
+    <!-- Window Controls & Workspace Switcher -->
+    <div class="menubar-right no-drag">
+      <div class="workspace-pill">
+        <span class="ws-dot"></span>
+        <span class="ws-label">Essentials</span>
+      </div>
+      <button class="win-btn minimize-btn" onclick="App.minimizeWindow()" title="Minimize">─</button>
+      <button class="win-btn maximize-btn" onclick="App.toggleMaximize()" title="Zoom / Maximize">□</button>
+      <button class="win-btn close-btn" onclick="App.closeApp()" title="Close">✕</button>
+    </div>
+  </header>
+
+
+  <!-- ==================== TOP OPTIONS BAR (PHOTOSHOP TOOL OPTIONS) ==================== -->
+  <section id="ps-options-bar" class="ps-options-bar no-drag">
+    <!-- Active Tool Icon & Name -->
+    <div class="option-tool-badge" id="opt-tool-badge" title="Active Tool">
+      <span id="opt-tool-icon">🖌️</span>
+      <span id="opt-tool-name">Brush Tool</span>
+    </div>
+    <span class="opt-separator"></span>
+
+    <!-- Dynamic Options Context (Replaced depending on selected tool) -->
+    <div id="options-dynamic-container" class="options-dynamic-container">
+      <!-- Default: Brush Options -->
+      <div class="opt-group opt-brush">
+        <label>Size:</label>
+        <input type="range" id="opt-brush-size" min="1" max="500" value="30" oninput="Tools.setBrushSize(this.value)">
+        <span id="opt-brush-size-val" class="opt-val">30 px</span>
+
+        <label>Hardness:</label>
+        <input type="range" id="opt-brush-hardness" min="0" max="100" value="80" oninput="Tools.setBrushHardness(this.value)">
+        <span id="opt-brush-hardness-val" class="opt-val">80%</span>
+
+        <label>Opacity:</label>
+        <input type="range" id="opt-brush-opacity" min="1" max="100" value="100" oninput="Tools.setBrushOpacity(this.value)">
+        <span id="opt-brush-opacity-val" class="opt-val">100%</span>
+
+        <label>Flow:</label>
+        <input type="range" id="opt-brush-flow" min="1" max="100" value="100" oninput="Tools.setBrushFlow(this.value)">
+        <span id="opt-brush-flow-val" class="opt-val">100%</span>
+
+        <label>Smoothing:</label>
+        <input type="range" id="opt-brush-smoothing" min="0" max="100" value="20" oninput="Tools.setBrushSmoothing(this.value)">
+        <span id="opt-brush-smoothing-val" class="opt-val">20%</span>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== MAIN WORKSPACE AREA ==================== -->
+  <main class="ps-workspace-body">
+
+    <!-- 1. LEFT TOOLBAR (PHOTOSHOP CLASSIC 1/2-COLUMN) -->
+    <aside id="ps-toolbar" class="ps-toolbar no-drag">
+      <div class="toolbar-header">
+        <button class="toolbar-col-toggle" onclick="Toolbar.toggleColumns()" title="Expand to 2 columns">»</button>
+      </div>
+
+      <div class="tools-grid" id="tools-grid">
+        <!-- V: Move -->
+        <button class="tool-btn active" data-tool="move" onclick="Tools.select('move')" title="Move Tool (V)">
+          <span class="tool-icon">✥</span>
+        </button>
+
+        <!-- M: Rectangular / Elliptical Marquee -->
+        <div class="tool-wrapper">
+          <button class="tool-btn" data-tool="marquee" onclick="Tools.select('marquee')" title="Rectangular Marquee Tool (M)">
+            <span class="tool-icon">⬚</span>
+            <span class="flyout-arrow">▾</span>
+          </button>
+        </div>
+
+        <!-- L: Lasso / Polygonal -->
+        <div class="tool-wrapper">
+          <button class="tool-btn" data-tool="lasso" onclick="Tools.select('lasso')" title="Lasso Tool (L)">
+            <span class="tool-icon">➰</span>
+            <span class="flyout-arrow">▾</span>
+          </button>
+        </div>
+
+        <!-- W: Magic Wand / Quick Selection -->
+        <div class="tool-wrapper">
+          <button class="tool-btn" data-tool="wand" onclick="Tools.select('wand')" title="Magic Wand Tool (W)">
+            <span class="tool-icon">🪄</span>
+            <span class="flyout-arrow">▾</span>
+          </button>
+        </div>
+
+        <!-- C: Crop -->
+        <button class="tool-btn" data-tool="crop" onclick="Tools.select('crop')" title="Crop Tool (C)">
+          <span class="tool-icon">⯐</span>
+        </button>
+
+        <!-- I: Eyedropper -->
+        <button class="tool-btn" data-tool="eyedropper" onclick="Tools.select('eyedropper')" title="Eyedropper Tool (I)">
+          <span class="tool-icon">💧</span>
+        </button>
+
+        <!-- J: Healing Brush -->
+        <button class="tool-btn" data-tool="healing" onclick="Tools.select('healing')" title="Spot Healing Brush (J)">
+          <span class="tool-icon">🩹</span>
+        </button>
+
+        <!-- B: Brush -->
+        <button class="tool-btn" data-tool="brush" onclick="Tools.select('brush')" title="Brush Tool (B)">
+          <span class="tool-icon">🖌️</span>
+        </button>
+
+        <!-- S: Clone Stamp -->
+        <button class="tool-btn" data-tool="stamp" onclick="Tools.select('stamp')" title="Clone Stamp Tool (S)">
+          <span class="tool-icon">⚚</span>
+        </button>
+
+        <!-- Y: History Brush -->
+        <button class="tool-btn" data-tool="history-brush" onclick="Tools.select('history-brush')" title="History Brush Tool (Y)">
+          <span class="tool-icon">📜</span>
+        </button>
+
+        <!-- E: Eraser -->
+        <button class="tool-btn" data-tool="eraser" onclick="Tools.select('eraser')" title="Eraser Tool (E)">
+          <span class="tool-icon">🧹</span>
+        </button>
+
+        <!-- G: Paint Bucket & Gradient -->
+        <div class="tool-wrapper">
+          <button class="tool-btn" data-tool="bucket" onclick="Tools.select('bucket')" title="Paint Bucket / Gradient (G)">
+            <span class="tool-icon">🪣</span>
+            <span class="flyout-arrow">▾</span>
+          </button>
+        </div>
+
+        <!-- O: Dodge / Burn / Sponge -->
+        <div class="tool-wrapper">
+          <button class="tool-btn" data-tool="dodge" onclick="Tools.select('dodge')" title="Dodge & Burn Tool (O)">
+            <span class="tool-icon">☀️</span>
+            <span class="flyout-arrow">▾</span>
+          </button>
+        </div>
+
+        <!-- P: Pen Tool (Vector Bezier) -->
+        <button class="tool-btn" data-tool="pen" onclick="Tools.select('pen')" title="Pen Tool (P)">
+          <span class="tool-icon">✒️</span>
+        </button>
+
+        <!-- T: Horizontal Type Tool -->
+        <button class="tool-btn" data-tool="text" onclick="Tools.select('text')" title="Horizontal Type Tool (T)">
+          <span class="tool-icon">T</span>
+        </button>
+
+        <!-- U: Shape Tools (Rect / Ellipse) -->
+        <div class="tool-wrapper">
+          <button class="tool-btn" data-tool="shape" onclick="Tools.select('shape')" title="Rectangle & Vector Shape Tool (U)">
+            <span class="tool-icon">▭</span>
+            <span class="flyout-arrow">▾</span>
+          </button>
+        </div>
+
+        <!-- H: Hand Tool -->
+        <button class="tool-btn" data-tool="hand" onclick="Tools.select('hand')" title="Hand Tool (H / Space)">
+          <span class="tool-icon">✋</span>
+        </button>
+
+        <!-- Z: Zoom Tool -->
+        <button class="tool-btn" data-tool="zoom" onclick="Tools.select('zoom')" title="Zoom Tool (Z)">
+          <span class="tool-icon">🔍</span>
+        </button>
+      </div>
+
+      <!-- Foreground & Background Color Chips (Photoshop Iconic Palette) -->
+      <div class="toolbar-color-section">
+        <button class="color-reset-btn" onclick="ColorPicker.resetDefaultColors()" title="Default Foreground/Background Colors (D)">◲</button>
+        <button class="color-swap-btn" onclick="ColorPicker.swapColors()" title="Switch Foreground/Background Colors (X)">⇄</button>
+        <div class="color-chips-box">
+          <div id="chip-fg" class="color-chip fg" style="background-color: #000000;" onclick="ColorPicker.openModal('fg')" title="Foreground Color"></div>
+          <div id="chip-bg" class="color-chip bg" style="background-color: #ffffff;" onclick="ColorPicker.openModal('bg')" title="Background Color"></div>
+        </div>
+      </div>
+    </aside>
+
+
+    <!-- 2. CENTER CANVAS VIEWPORT -->
+    <div id="ps-viewport" class="ps-viewport">
+      <!-- Horizontal Ruler -->
+      <div id="ruler-h" class="ruler-horizontal">
+        <canvas id="ruler-h-canvas"></canvas>
+      </div>
+      <!-- Vertical Ruler -->
+      <div id="ruler-v" class="ruler-vertical">
+        <canvas id="ruler-v-canvas"></canvas>
+      </div>
+      <!-- Ruler Corner Box -->
+      <div class="ruler-corner">px</div>
+
+      <!-- Canvas Scroll & Zoom Stage -->
+      <div id="canvas-stage" class="canvas-stage">
+        <!-- Document Artboard Paper -->
+        <div id="artboard" class="artboard">
+          <!-- Checkerboard Pattern Background for Alpha -->
+          <div class="checkerboard-bg"></div>
+
+          <!-- Master Layers Stack Container -->
+          <div id="layers-container" class="layers-container"></div>
+
+          <!-- Selection Marching Ants Canvas Overlay -->
+          <canvas id="selection-overlay" class="overlay-canvas"></canvas>
+
+          <!-- Free Transform Bounding Box Handles -->
+          <div id="transform-box" class="transform-box hidden">
+            <div class="handle nw" data-handle="nw"></div>
+            <div class="handle n" data-handle="n"></div>
+            <div class="handle ne" data-handle="ne"></div>
+            <div class="handle w" data-handle="w"></div>
+            <div class="handle e" data-handle="e"></div>
+            <div class="handle sw" data-handle="sw"></div>
+            <div class="handle s" data-handle="s"></div>
+            <div class="handle se" data-handle="se"></div>
+            <div class="rotate-handle" data-handle="rotate"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Status Bar -->
+      <div class="canvas-status-bar">
+        <div class="status-left">
+          <span id="status-zoom-label" class="status-pill" onclick="Canvas.promptZoom()">100.00%</span>
+          <span id="status-doc-size" class="status-pill">1920 × 1080 px (72 ppi)</span>
+          <span id="status-color-mode" class="status-pill">RGB / 8-bit</span>
+        </div>
+        <div class="status-right">
+          <span id="status-cursor-coords">X: 0 px  Y: 0 px</span>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- 3. RIGHT DOCK PANELS (PHOTOSHOP ESSENTIALS) -->
+    <aside id="ps-dock" class="ps-dock no-drag">
+      
+      <!-- Panel 1: Color & Swatches -->
+      <div class="dock-panel" id="panel-color">
+        <div class="panel-header">
+          <span class="panel-title">COLOR</span>
+          <button class="panel-collapse-btn" onclick="Panels.toggleCollapse('panel-color')">▾</button>
+        </div>
+        <div class="panel-body">
+          <div class="color-picker-inline">
+            <div class="color-spectrum-box" id="color-spectrum-box">
+              <div class="spectrum-cursor" id="spectrum-cursor"></div>
+            </div>
+            <div class="hue-slider-box">
+              <input type="range" id="hue-slider" min="0" max="360" value="210" oninput="ColorPicker.setHue(this.value)">
+            </div>
+            <div class="color-hex-row">
+              <span class="hex-label">HEX: #</span>
+              <input type="text" id="hex-input" class="hex-input" value="000000" maxlength="6" onchange="ColorPicker.setHex(this.value)">
+              <div id="active-color-preview" class="color-preview-box"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 2: History (Undo / Redo Stack) -->
+      <div class="dock-panel" id="panel-history">
+        <div class="panel-header">
+          <span class="panel-title">HISTORY</span>
+          <button class="panel-collapse-btn" onclick="Panels.toggleCollapse('panel-history')">▾</button>
+        </div>
+        <div class="panel-body">
+          <div id="history-list" class="history-list">
+            <!-- Dynamic History Steps -->
+            <div class="history-item active" data-step="0">
+              <span class="step-icon">📄</span>
+              <span class="step-label">New Document</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 3: Layers (The Heart of Photoshop) -->
+      <div class="dock-panel flex-panel" id="panel-layers">
+        <div class="panel-header">
+          <span class="panel-title">LAYERS</span>
+          <button class="panel-collapse-btn" onclick="Panels.toggleCollapse('panel-layers')">▾</button>
+        </div>
+
+        <!-- Layer Controls: Blend Mode & Opacity -->
+        <div class="layers-top-controls">
+          <div class="blend-mode-select-wrap">
+            <select id="layer-blend-mode" class="ps-select" onchange="Layers.setActiveBlendMode(this.value)">
+              <option value="normal">Normal</option>
+              <option value="dissolve">Dissolve</option>
+              <optgroup label="Darken">
+                <option value="darken">Darken</option>
+                <option value="multiply">Multiply</option>
+                <option value="color-burn">Color Burn</option>
+              </optgroup>
+              <optgroup label="Lighten">
+                <option value="lighten">Lighten</option>
+                <option value="screen">Screen</option>
+                <option value="color-dodge">Color Dodge</option>
+              </optgroup>
+              <optgroup label="Contrast">
+                <option value="overlay">Overlay</option>
+                <option value="soft-light">Soft Light</option>
+                <option value="hard-light">Hard Light</option>
+              </optgroup>
+              <optgroup label="Comparative">
+                <option value="difference">Difference</option>
+                <option value="exclusion">Exclusion</option>
+              </optgroup>
+              <optgroup label="Color Component">
+                <option value="hue">Hue</option>
+                <option value="saturation">Saturation</option>
+                <option value="color">Color</option>
+                <option value="luminosity">Luminosity</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div class="layer-opacity-wrap">
+            <span class="label">Opacity:</span>
+            <input type="number" id="layer-opacity-input" class="ps-num-input" min="0" max="100" value="100" onchange="Layers.setActiveOpacity(this.value)">
+            <span class="unit">%</span>
+          </div>
+        </div>
+
+        <!-- Layer Items Stack List -->
+        <div class="panel-body flex-body">
+          <div id="layers-stack-list" class="layers-stack-list">
+            <!-- Dynamic Layer Items rendered here -->
+          </div>
+        </div>
+
+        <!-- Bottom Action Bar for Layers (Photoshop Classics) -->
+        <div class="layers-footer-actions">
+          <button class="layer-action-btn" onclick="Layers.linkLayers()" title="Link Layers">🔗</button>
+          <button class="layer-action-btn" onclick="Layers.showLayerEffectsDialog()" title="Add a Layer Style (fx)">ƒx</button>
+          <button class="layer-action-btn" onclick="Layers.createLayerMask()" title="Add Layer Mask">◲</button>
+          <button class="layer-action-btn" onclick="Filters.showNewAdjustmentMenu()" title="Create New Adjustment Layer">◐</button>
+          <button class="layer-action-btn" onclick="Layers.createFolder()" title="Create a New Group / Folder">📁</button>
+          <button class="layer-action-btn" onclick="Layers.createLayer()" title="Create a New Layer">⧉</button>
+          <button class="layer-action-btn" onclick="Layers.deleteActiveLayer()" title="Delete Layer">🗑️</button>
+        </div>
+      </div>
+
+    </aside>
+
+  </main>
+
+
+  <!-- ==================== NEW DOCUMENT MODAL ==================== -->
+  <div id="modal-new-doc" class="ps-modal hidden">
+    <div class="modal-backdrop" onclick="App.closeNewDocumentDialog()"></div>
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3>New Document</h3>
+        <button class="modal-close-btn" onclick="App.closeNewDocumentDialog()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="preset-chips">
+          <button class="preset-chip active" onclick="App.applyDocPreset(1920, 1080)">Full HD (1920×1080)</button>
+          <button class="preset-chip" onclick="App.applyDocPreset(3840, 2160)">4K UHD (3840×2160)</button>
+          <button class="preset-chip" onclick="App.applyDocPreset(1080, 1080)">Square Post (1080×1080)</button>
+          <button class="preset-chip" onclick="App.applyDocPreset(1080, 1920)">Story / Reel (1080×1920)</button>
+          <button class="preset-chip" onclick="App.applyDocPreset(2480, 3508)">A4 Print (300 ppi)</button>
+        </div>
+        <div class="modal-form-grid">
+          <div class="form-group">
+            <label>Name:</label>
+            <input type="text" id="new-doc-name" value="Untitled-1" class="ps-input">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Width (px):</label>
+              <input type="number" id="new-doc-w" value="1920" class="ps-input">
+            </div>
+            <div class="form-group">
+              <label>Height (px):</label>
+              <input type="number" id="new-doc-h" value="1080" class="ps-input">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Resolution (ppi):</label>
+              <input type="number" id="new-doc-res" value="72" class="ps-input">
+            </div>
+            <div class="form-group">
+              <label>Background Contents:</label>
+              <select id="new-doc-bg" class="ps-select">
+                <option value="white">White</option>
+                <option value="black">Black</option>
+                <option value="transparent">Transparent</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="ps-btn secondary" onclick="App.closeNewDocumentDialog()">Cancel</button>
+        <button class="ps-btn primary" onclick="App.confirmNewDocument()">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden native file input for Opening Files -->
+  <input type="file" id="native-file-input" style="display:none;" accept="image/*,.psd" onchange="App.handleFileInput(event)">
+
+  <!-- Application Logic Scripts -->
+  <script src="js/color.js"></script>
+  <script src="js/history.js"></script>
+  <script src="js/layer.js"></script>
+  <script src="js/canvas.js"></script>
+  <script src="js/tools.js"></script>
+  <script src="js/filters.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

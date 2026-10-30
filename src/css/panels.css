@@ -1,0 +1,314 @@
+/* ==================== PIKTURA STUDIO — RIGHT DOCK PANELS ==================== */
+.ps-dock {
+  width: 280px;
+  background: var(--ps-bg-dark);
+  border-left: 1px solid var(--ps-border-dark);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.dock-panel {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--ps-border-dark);
+  background: var(--ps-bg-dark);
+}
+
+.dock-panel.flex-panel {
+  flex: 1;
+  min-height: 180px;
+  overflow: hidden;
+}
+
+.panel-header {
+  height: 26px;
+  background: var(--ps-bg-darkest);
+  border-bottom: 1px solid var(--ps-border-dark);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: var(--ps-text-muted);
+  cursor: pointer;
+}
+
+.panel-collapse-btn {
+  background: transparent;
+  border: none;
+  color: var(--ps-text-dim);
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.panel-body {
+  padding: 8px;
+  overflow-y: auto;
+}
+
+.panel-body.flex-body {
+  flex: 1;
+  padding: 0;
+  overflow-y: auto;
+}
+
+/* ==================== PANEL: COLOR ==================== */
+.color-picker-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.color-spectrum-box {
+  width: 100%;
+  height: 90px;
+  border: 1px solid var(--ps-border-subtle);
+  border-radius: 4px;
+  position: relative;
+  cursor: crosshair;
+  background: linear-gradient(to bottom, transparent, #000), linear-gradient(to right, #fff, hsl(210, 100%, 50%));
+}
+
+.spectrum-cursor {
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+  border-radius: 50%;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.hue-slider-box input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(to right, 
+    #ff0000 0%, #ffff00 17%, #00ff00 33%, 
+    #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+  outline: none;
+}
+
+.hue-slider-box input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #000;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  cursor: pointer;
+}
+
+.color-hex-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.hex-input {
+  width: 75px;
+  background: var(--ps-bg-darkest);
+  border: 1px solid var(--ps-border-subtle);
+  color: #fff;
+  border-radius: 3px;
+  padding: 3px 6px;
+  font-family: var(--ps-font-mono);
+  font-size: 11px;
+}
+
+.color-preview-box {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid var(--ps-border-subtle);
+  background: #000000;
+  margin-left: auto;
+}
+
+/* ==================== PANEL: HISTORY ==================== */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 110px;
+  overflow-y: auto;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  font-size: 11.5px;
+  color: var(--ps-text-muted);
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.history-item:hover {
+  background: var(--ps-bg-medium);
+  color: #fff;
+}
+
+.history-item.active {
+  background: var(--ps-accent-bright);
+  color: #ffffff;
+}
+
+/* ==================== PANEL: LAYERS ==================== */
+.layers-top-controls {
+  padding: 6px 8px;
+  background: var(--ps-bg-medium);
+  border-bottom: 1px solid var(--ps-border-dark);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.blend-mode-select-wrap {
+  flex: 1;
+}
+
+.blend-mode-select-wrap select {
+  width: 100%;
+}
+
+.layer-opacity-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--ps-text-muted);
+}
+
+.layer-opacity-wrap input {
+  width: 48px;
+  text-align: right;
+}
+
+/* Layer Items Stack */
+.layers-stack-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.layer-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--ps-border-dark);
+  background: var(--ps-bg-dark);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.layer-row:hover {
+  background: var(--ps-bg-medium);
+}
+
+.layer-row.active {
+  background: var(--ps-bg-light);
+  border-left: 3px solid var(--ps-accent-bright);
+}
+
+.layer-visibility-btn {
+  background: transparent;
+  border: none;
+  color: var(--ps-text-main);
+  font-size: 13px;
+  cursor: pointer;
+  width: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.layer-visibility-btn.hidden {
+  opacity: 0.2;
+}
+
+.layer-thumb-box {
+  width: 32px;
+  height: 24px;
+  background: #ffffff;
+  border: 1px solid var(--ps-border-subtle);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.layer-thumb-box canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.layer-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.layer-name {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ps-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.layer-badges {
+  display: flex;
+  gap: 4px;
+  font-size: 9.5px;
+  color: var(--ps-text-dim);
+}
+
+.layer-lock-icon {
+  font-size: 11px;
+  color: var(--ps-text-dim);
+}
+
+/* Bottom Actions in Layers Panel */
+.layers-footer-actions {
+  height: 32px;
+  background: var(--ps-bg-darkest);
+  border-top: 1px solid var(--ps-border-dark);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 6px;
+}
+
+.layer-action-btn {
+  background: transparent;
+  border: none;
+  color: var(--ps-text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.1s;
+}
+
+.layer-action-btn:hover {
+  background: var(--ps-bg-hover);
+  color: #fff;
+}
