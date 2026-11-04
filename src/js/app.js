@@ -2,7 +2,7 @@
  * Piktura Studio — Core Application Coordinator & Menus
  */
 const App = {
-  version: "1.0.0",
+  version: "1.1.0",
 
   init() {
     ColorPicker.init();
@@ -26,8 +26,8 @@ const App = {
       const shift = e.shiftKey;
       const alt = e.altKey;
 
-      // Photoshop Keybindings
-      if (cmd && !shift && e.code === "KeyZ") {
+      // Photoshop Keybindings with Cmd / Ctrl
+      if (cmd && !shift && !alt && e.code === "KeyZ") {
         e.preventDefault();
         History.undo();
       } else if (cmd && shift && e.code === "KeyZ") {
@@ -42,6 +42,12 @@ const App = {
       } else if (cmd && !shift && e.code === "KeyS") {
         e.preventDefault();
         this.exportImage("png");
+      } else if (cmd && shift && e.code === "KeyS") {
+        e.preventDefault();
+        this.exportAsDialog();
+      } else if (cmd && alt && shift && e.code === "KeyW") {
+        e.preventDefault();
+        this.exportAsDialog();
       } else if (cmd && !shift && e.code === "KeyJ") {
         e.preventDefault();
         Layers.duplicateActiveLayer();
@@ -60,6 +66,30 @@ const App = {
       } else if (cmd && !shift && e.code === "KeyD") {
         e.preventDefault();
         Selection.deselect();
+      } else if (cmd && shift && e.code === "KeyI") {
+        e.preventDefault();
+        Selection.inverse();
+      } else if (cmd && !shift && e.code === "KeyL") {
+        e.preventDefault();
+        Filters.showLevels();
+      } else if (cmd && !shift && e.code === "KeyM") {
+        e.preventDefault();
+        Filters.showCurves();
+      } else if (cmd && !shift && e.code === "KeyU") {
+        e.preventDefault();
+        Filters.showHueSaturation();
+      } else if (cmd && !shift && e.code === "KeyI") {
+        e.preventDefault();
+        Filters.invert();
+      } else if (cmd && shift && e.code === "KeyU") {
+        e.preventDefault();
+        Filters.desaturate();
+      } else if (cmd && shift && e.code === "KeyL") {
+        e.preventDefault();
+        Filters.autoTone();
+      } else if (cmd && (e.code === "Semicolon" || e.key === ";")) {
+        e.preventDefault();
+        Canvas.toggleGuides();
       } else if (cmd && !shift && (e.code === "Equal" || e.key === "+")) {
         e.preventDefault();
         Canvas.zoomIn();
@@ -77,7 +107,24 @@ const App = {
         Canvas.toggleRulers();
       }
 
-      // Single-Key Tool Selection
+      // Bracket Shortcuts for Brush Size & Hardness
+      if (!cmd && !alt) {
+        if (!shift && e.code === "BracketLeft") {
+          e.preventDefault();
+          Tools.setBrushSize(Tools.brushSize <= 10 ? Tools.brushSize - 1 : Tools.brushSize - 5);
+        } else if (!shift && e.code === "BracketRight") {
+          e.preventDefault();
+          Tools.setBrushSize(Tools.brushSize < 10 ? Tools.brushSize + 1 : Tools.brushSize + 5);
+        } else if (shift && e.code === "BracketLeft") {
+          e.preventDefault();
+          Tools.setBrushHardness(Tools.brushHardness - 10);
+        } else if (shift && e.code === "BracketRight") {
+          e.preventDefault();
+          Tools.setBrushHardness(Tools.brushHardness + 10);
+        }
+      }
+
+      // Single-Key Tool Selection & Numeric Opacity (Photoshop Classics)
       if (!cmd && !alt && !shift) {
         switch (e.code) {
           case "KeyV": Tools.select("move"); break;
@@ -90,7 +137,9 @@ const App = {
           case "KeyB": Tools.select("brush"); break;
           case "KeyS": Tools.select("stamp"); break;
           case "KeyE": Tools.select("eraser"); break;
-          case "KeyG": Tools.select("bucket"); break;
+          case "KeyG":
+            Tools.select(Tools.currentTool === "bucket" ? "gradient" : "bucket");
+            break;
           case "KeyO": Tools.select("dodge"); break;
           case "KeyP": Tools.select("pen"); break;
           case "KeyT": Tools.select("text"); break;
@@ -99,16 +148,19 @@ const App = {
           case "KeyZ": Tools.select("zoom"); break;
           case "KeyX": ColorPicker.swapColors(); break;
           case "KeyD": ColorPicker.resetDefaultColors(); break;
-          case "BracketLeft":
-            Tools.setBrushSize(Math.max(1, Tools.brushSize - 5));
-            break;
-          case "BracketRight":
-            Tools.setBrushSize(Tools.brushSize + 5);
-            break;
           case "Backspace":
           case "Delete":
             Tools.clear();
             break;
+        }
+
+        // Numbers 1-9, 0 for Quick Opacity Setting (1 = 10%, 5 = 50%, 0 = 100%)
+        if (e.code.startsWith("Digit")) {
+          const digit = parseInt(e.code.replace("Digit", ""), 10);
+          if (!isNaN(digit)) {
+            const op = digit === 0 ? 100 : digit * 10;
+            Tools.setBrushOpacity(op);
+          }
         }
       }
     });
@@ -129,7 +181,7 @@ const App = {
     document.getElementById("new-doc-w").value = w;
     document.getElementById("new-doc-h").value = h;
     document.querySelectorAll(".preset-chip").forEach(c => c.classList.remove("active"));
-    event.target.classList.add("active");
+    if (event && event.target) event.target.classList.add("active");
   },
 
   confirmNewDocument() {
@@ -161,10 +213,8 @@ const App = {
     reader.onload = (event) => {
       const img = new Image();
       img.onload = () => {
-        // Init document to image dimensions
         Layers.init(img.width, img.height, "transparent");
         const active = Layers.getActiveLayer();
-        active.name = file.name;
         active.ctx.drawImage(img, 0, 0);
 
         History.stack = [];
@@ -181,12 +231,52 @@ const App = {
     reader.readAsDataURL(file);
   },
 
-  exportImage(format = "png") {
-    // Composite all visible layers onto an export canvas
+  // Export As Dialog & Engine
+  exportAsDialog() {
+    const modal = document.getElementById("modal-export");
+    if (modal) modal.classList.remove("hidden");
+  },
+
+  closeExportModal() {
+    const modal = document.getElementById("modal-export");
+    if (modal) modal.classList.add("hidden");
+  },
+
+  onExportFormatChange() {
+    const fmt = document.getElementById("export-format").value;
+    const qGrp = document.getElementById("export-quality-grp");
+    if (qGrp) {
+      qGrp.style.display = (fmt === "jpeg" || fmt === "webp") ? "block" : "none";
+    }
+  },
+
+  confirmExport() {
+    const fmt = document.getElementById("export-format").value || "png";
+    const scale = parseFloat(document.getElementById("export-scale").value) || 1.0;
+    const quality = parseInt(document.getElementById("export-quality").value, 10) / 100 || 0.92;
+
+    this.closeExportModal();
+    this.exportImage(fmt, quality, scale);
+  },
+
+  exportImage(format = "png", quality = 0.95, scale = 1.0) {
+    const outW = Math.round(Layers.docWidth * scale);
+    const outH = Math.round(Layers.docHeight * scale);
+
     const expCanvas = document.createElement("canvas");
-    expCanvas.width = Layers.docWidth;
-    expCanvas.height = Layers.docHeight;
+    expCanvas.width = outW;
+    expCanvas.height = outH;
     const ctx = expCanvas.getContext("2d");
+
+    if (scale !== 1.0) {
+      ctx.scale(scale, scale);
+    }
+
+    // Fill white background for JPEG exports
+    if (format === "jpeg") {
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, Layers.docWidth, Layers.docHeight);
+    }
 
     Layers.layers.forEach(l => {
       if (l.visible) {
@@ -198,8 +288,8 @@ const App = {
       }
     });
 
-    const mime = format === "jpeg" ? "image/jpeg" : "image/png";
-    const dataUrl = expCanvas.toDataURL(mime, 0.95);
+    const mime = format === "jpeg" ? "image/jpeg" : (format === "webp" ? "image/webp" : "image/png");
+    const dataUrl = expCanvas.toDataURL(mime, quality);
 
     const a = document.createElement("a");
     a.href = dataUrl;
@@ -210,11 +300,11 @@ const App = {
   },
 
   saveProject() {
-    this.exportImage("png");
+    this.exportAsDialog();
   },
 
   saveProjectAs() {
-    this.exportImage("png");
+    this.exportAsDialog();
   },
 
   closeDocument() {
@@ -224,11 +314,11 @@ const App = {
   },
 
   showAboutModal() {
-    alert("🎨 Piktura Studio v1.0.0\nProfessional GPU-Accelerated Creative Suite for macOS & Creators.\n\nDesigned by KIB.best • 100% Offline & Private");
+    alert("🎨 Piktura Studio v1.1.0\nProfessional GPU-Accelerated Creative Suite for macOS & Creators.\n\nDesigned by KIB.best • 100% Offline & Private");
   },
 
   showShortcutsModal() {
-    alert("Photoshop Hotkeys in Piktura:\nV - Move\nM - Marquee\nL - Lasso\nW - Magic Wand\nB - Brush\nE - Eraser\nG - Bucket\nP - Pen\nT - Text\nZ - Zoom\nH / Space - Hand Pan\nCmd+J - Duplicate Layer\nCmd+Z - Undo\nCmd+Shift+Z - Redo\n[ / ] - Brush Size");
+    alert("Photoshop Hotkeys in Piktura:\nV - Move\nM - Marquee\nL - Lasso\nW - Magic Wand\nB - Brush\nE - Eraser\nG - Bucket / Gradient\nO - Dodge & Burn\nP - Pen\nT - Text\nU - Shapes\nZ - Zoom\nH / Space - Hand Pan\n[ / ] - Brush Size\nShift + [ / ] - Brush Hardness\n1 - 0 - Brush Opacity (10%-100%)\nCmd+J - Duplicate Layer\nCmd+E - Merge Down\nCmd+L - Levels\nCmd+M - Curves\nCmd+U - Hue/Saturation\nCmd+; - Toggle Guides\nCmd+Z - Undo\nCmd+Shift+Z - Redo");
   },
 
   minimizeWindow() {

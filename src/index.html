@@ -31,8 +31,7 @@
             <div class="menu-entry" onclick="App.saveProjectAs()"><span class="label">Save As...</span><span class="shortcut">⇧⌘S</span></div>
             <div class="menu-divider"></div>
             <div class="menu-entry" onclick="App.exportImage('png')"><span class="label">Quick Export as PNG</span><span class="shortcut">⌥⇧⌘W</span></div>
-            <div class="menu-entry" onclick="App.exportImage('jpeg')"><span class="label">Export as JPEG...</span></div>
-            <div class="menu-entry" onclick="App.exportImage('webp')"><span class="label">Export as WebP...</span></div>
+            <div class="menu-entry" onclick="App.exportAsDialog()"><span class="label">Export As...</span><span class="shortcut">⇧⌘S</span></div>
             <div class="menu-divider"></div>
             <div class="menu-entry" onclick="App.closeDocument()"><span class="label">Close</span><span class="shortcut">⌘W</span></div>
           </div>
@@ -297,9 +296,13 @@
 
         <!-- G: Paint Bucket & Gradient -->
         <div class="tool-wrapper">
-          <button class="tool-btn" data-tool="bucket" onclick="Tools.select('bucket')" title="Paint Bucket / Gradient (G)">
+          <button class="tool-btn" data-tool="bucket" onclick="Tools.select('bucket')" title="Paint Bucket Tool (G)">
             <span class="tool-icon">🪣</span>
-            <span class="flyout-arrow">▾</span>
+          </button>
+        </div>
+        <div class="tool-wrapper">
+          <button class="tool-btn" data-tool="gradient" onclick="Tools.select('gradient')" title="Gradient Tool (G)">
+            <span class="tool-icon">▨</span>
           </button>
         </div>
 
@@ -396,7 +399,13 @@
       <!-- Bottom Status Bar -->
       <div class="canvas-status-bar">
         <div class="status-left">
-          <span id="status-zoom-label" class="status-pill" onclick="Canvas.promptZoom()">100.00%</span>
+          <div class="status-zoom-controls">
+            <button class="status-zoom-btn" onclick="Canvas.zoomOut()" title="Zoom Out (⌘-)">−</button>
+            <span id="status-zoom-label" class="doc-tab-zoom" onclick="Canvas.promptZoom()" title="Click to enter zoom">100%</span>
+            <button class="status-zoom-btn" onclick="Canvas.zoomIn()" title="Zoom In (⌘+)">+</button>
+            <button class="status-zoom-btn" onclick="Canvas.fitToScreen()" title="Fit to Screen (⌘0)">Fit</button>
+            <button class="status-zoom-btn" onclick="Canvas.actualPixels()" title="100% (⌘1)">100%</button>
+          </div>
           <span id="status-doc-size" class="status-pill">1920 × 1080 px (72 ppi)</span>
           <span id="status-color-mode" class="status-pill">RGB / 8-bit</span>
         </div>
@@ -575,6 +584,75 @@
       </div>
     </div>
   </div>
+
+  <!-- ==================== ADJUSTMENT MODAL (LEVELS, CURVES, HUE/SAT, BRIGHTNESS) ==================== -->
+  <div id="modal-adjustment" class="ps-modal hidden">
+    <div class="modal-backdrop" onclick="Filters.cancelAdjustment()"></div>
+    <div class="modal-window" style="width: 440px;">
+      <div class="modal-header">
+        <h3 id="modal-adj-title">Adjustment</h3>
+        <button class="modal-close-btn" onclick="Filters.cancelAdjustment()">✕</button>
+      </div>
+      <div class="modal-body" id="modal-adj-body">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button class="ps-btn secondary" onclick="Filters.cancelAdjustment()">Cancel</button>
+        <button class="ps-btn primary" onclick="Filters.confirmAdjustment()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== EXPORT AS MODAL ==================== -->
+  <div id="modal-export" class="ps-modal hidden">
+    <div class="modal-backdrop" onclick="App.closeExportModal()"></div>
+    <div class="modal-window" style="width: 480px;">
+      <div class="modal-header">
+        <h3>Export As...</h3>
+        <button class="modal-close-btn" onclick="App.closeExportModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Format:</label>
+          <select id="export-format" class="ps-select" onchange="App.onExportFormatChange()">
+            <option value="png">PNG (Lossless with Alpha Transparency)</option>
+            <option value="jpeg">JPEG (Standard Compressed)</option>
+            <option value="webp">WebP (Modern Ultra-Fast Web)</option>
+          </select>
+        </div>
+        <div class="form-group" id="export-quality-grp" style="margin-top:14px; display:none;">
+          <div style="display:flex; justify-content:space-between;">
+            <label>Quality:</label>
+            <span id="export-quality-val" style="color:var(--ps-accent)">92%</span>
+          </div>
+          <input type="range" id="export-quality" min="10" max="100" value="92" class="ps-range" oninput="document.getElementById('export-quality-val').innerText=this.value+'%'">
+        </div>
+        <div class="form-row" style="margin-top:14px;">
+          <div class="form-group">
+            <label>Scale:</label>
+            <select id="export-scale" class="ps-select">
+              <option value="1">1x (Original 100%)</option>
+              <option value="2">2x (Retina @2x)</option>
+              <option value="0.5">0.5x (Thumbnail 50%)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Color Space:</label>
+            <select class="ps-select" disabled>
+              <option>sRGB IEC61966-2.1</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="ps-btn secondary" onclick="App.closeExportModal()">Cancel</button>
+        <button class="ps-btn primary" onclick="App.confirmExport()">Export...</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Photoshop Dynamic Circle Brush Ring Cursor -->
+  <div id="brush-cursor" class="brush-cursor"></div>
 
   <!-- Hidden native file input for Opening Files -->
   <input type="file" id="native-file-input" style="display:none;" accept="image/*,.psd" onchange="App.handleFileInput(event)">

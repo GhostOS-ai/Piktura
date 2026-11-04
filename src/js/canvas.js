@@ -10,18 +10,32 @@ const Canvas = {
   startPanY: 0,
   rulersVisible: true,
   gridVisible: false,
+  guides: [],
+  guidesVisible: true,
 
   init() {
     this.setupViewportEvents();
+    this.setupGuides();
     this.updateViewportTransform();
     this.drawRulers();
+  },
+
+  getCanvasCoords(e) {
+    const artboard = document.getElementById("artboard");
+    if (!artboard) return { x: 0, y: 0 };
+    const rect = artboard.getBoundingClientRect();
+    if (!rect || rect.width <= 0 || rect.height <= 0) return { x: 0, y: 0 };
+    return {
+      x: (e.clientX - rect.left) * (Layers.docWidth / rect.width),
+      y: (e.clientY - rect.top) * (Layers.docHeight / rect.height)
+    };
   },
 
   setupViewportEvents() {
     const stage = document.getElementById("canvas-stage");
     if (!stage) return;
 
-    // Mouse wheel zoom (Option + Scroll or standard pinch/zoom)
+    // Mouse wheel zoom (Option/Meta + Scroll or standard pinch/zoom)
     stage.addEventListener("wheel", (e) => {
       e.preventDefault();
       if (e.metaKey || e.ctrlKey || e.altKey) {
@@ -38,15 +52,24 @@ const Canvas = {
 
     // Track Cursor Coordinates for Status Bar
     stage.addEventListener("mousemove", (e) => {
-      const artboard = document.getElementById("artboard");
-      if (!artboard) return;
-      const rect = artboard.getBoundingClientRect();
-      const canvasX = Math.round((e.clientX - rect.left) / this.zoom);
-      const canvasY = Math.round((e.clientY - rect.top) / this.zoom);
+      const coords = this.getCanvasCoords(e);
+      const canvasX = Math.round(coords.x);
+      const canvasY = Math.round(coords.y);
 
       const coordEl = document.getElementById("status-cursor-coords");
       if (coordEl) {
         coordEl.innerText = `X: ${canvasX} px   Y: ${canvasY} px`;
+      }
+    });
+
+    // Zoom Tool Click Action
+    stage.addEventListener("click", (e) => {
+      if (Tools.currentTool === "zoom") {
+        if (e.altKey) {
+          this.zoomOut();
+        } else {
+          this.zoomIn();
+        }
       }
     });
 
@@ -62,6 +85,84 @@ const Canvas = {
         stage.style.cursor = "default";
       }
     });
+  },
+
+  setupGuides() {
+    const hRuler = document.getElementById("ruler-h");
+    const vRuler = document.getElementById("ruler-v");
+    if (hRuler) {
+      hRuler.addEventListener("mousedown", (e) => {
+        this.startDragGuide("h", e);
+      });
+    }
+    if (vRuler) {
+      vRuler.addEventListener("mousedown", (e) => {
+        this.startDragGuide("v", e);
+      });
+    }
+  },
+
+  startDragGuide(type, e) {
+    const coords = this.getCanvasCoords(e);
+    const guidePos = Math.round(type === "h" ? coords.y : coords.x);
+    const guide = { type, pos: guidePos };
+    this.guides.push(guide);
+    this.renderGuides();
+
+    const onMove = (me) => {
+      const c = this.getCanvasCoords(me);
+      guide.pos = Math.round(type === "h" ? c.y : c.x);
+      this.renderGuides();
+    };
+
+    const onUp = (ue) => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+      const c = this.getCanvasCoords(ue);
+      if (type === "h" && (c.y < 0 || c.y > Layers.docHeight)) {
+        this.guides = this.guides.filter(g => g !== guide);
+      } else if (type === "v" && (c.x < 0 || c.x > Layers.docWidth)) {
+        this.guides = this.guides.filter(g => g !== guide);
+      }
+      this.renderGuides();
+    };
+
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  },
+
+  renderGuides() {
+    const artboard = document.getElementById("artboard");
+    if (!artboard) return;
+    let container = document.getElementById("guides-container");
+    if (!container) {
+      container = document.createElement("div");
+      container.id = "guides-container";
+      container.style.position = "absolute";
+      container.style.inset = "0";
+      container.style.pointerEvents = "none";
+      container.style.zIndex = "450";
+      artboard.appendChild(container);
+    }
+    container.innerHTML = "";
+    if (!this.guidesVisible) return;
+
+    this.guides.forEach(g => {
+      const line = document.createElement("div");
+      if (g.type === "h") {
+        line.className = "guide-line-h";
+        line.style.top = `${g.pos}px`;
+      } else {
+        line.className = "guide-line-v";
+        line.style.left = `${g.pos}px`;
+      }
+      container.appendChild(line);
+    });
+  },
+
+  toggleGuides() {
+    this.guidesVisible = !this.guidesVisible;
+    this.renderGuides();
   },
 
   setZoom(newZoom, centerX = null, centerY = null) {
