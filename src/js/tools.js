@@ -67,30 +67,32 @@ const Tools = {
     if (!container) return;
 
     const t = (k) => (window.I18n ? I18n.t(k) : k);
+    const svgWrap = (path) => `<svg viewBox="0 0 20 20" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle;">${path}</svg>`;
+
     const toolMeta = {
-      move: { name: t("tool_move"), icon: "✥" },
-      marquee: { name: t("tool_marquee"), icon: "⬚" },
-      lasso: { name: t("tool_lasso"), icon: "➰" },
-      wand: { name: t("tool_wand"), icon: "🪄" },
-      crop: { name: t("tool_crop"), icon: "⯐" },
-      eyedropper: { name: t("tool_eyedropper"), icon: "💧" },
-      healing: { name: t("tool_healing"), icon: "🩹" },
-      brush: { name: t("tool_brush"), icon: "🖌️" },
-      stamp: { name: t("tool_stamp"), icon: "⚚" },
-      "history-brush": { name: t("tool_history_brush"), icon: "📜" },
-      eraser: { name: t("tool_eraser"), icon: "🧹" },
-      gradient: { name: t("tool_gradient"), icon: "▨" },
-      bucket: { name: t("tool_bucket"), icon: "🪣" },
-      dodge: { name: t("tool_dodge"), icon: "☀️" },
-      pen: { name: t("tool_pen"), icon: "✒️" },
-      text: { name: t("tool_text"), icon: "T" },
-      shape: { name: t("tool_shape"), icon: "▭" },
-      hand: { name: t("tool_hand"), icon: "✋" },
-      zoom: { name: t("tool_zoom"), icon: "🔍" }
+      move: { name: t("tool_move"), icon: svgWrap('<path d="M10 2v16M2 10h16M10 2l-2.5 2.5M10 2l2.5 2.5M10 18l-2.5-2.5M10 18l2.5-2.5M2 10l2.5-2.5M2 10l2.5 2.5M18 10l-2.5-2.5M18 10l2.5 2.5"/>') },
+      marquee: { name: t("tool_marquee"), icon: svgWrap('<rect x="3" y="4" width="14" height="12" rx="1" stroke-dasharray="2.5 2"/>') },
+      lasso: { name: t("tool_lasso"), icon: svgWrap('<path d="M14 6c0-2.2-2.7-3.5-5.5-3.5S3 4.5 3 8s2.5 6 6 6c2.5 0 4.5-1 5.5-3l2.5 6"/>') },
+      wand: { name: t("tool_wand"), icon: svgWrap('<path d="M4 16l8.5-8.5M12.5 7.5l2-2a1.4 1.4 0 0 1 2 2l-2 2M15 2v2M14 3h2M7 3v1M6.5 3.5h1M3 8v1M2.5 8.5h1"/>') },
+      crop: { name: t("tool_crop"), icon: svgWrap('<path d="M6 2v12h12M2 6h12v12M14 2v4M18 6h-4"/>') },
+      eyedropper: { name: t("tool_eyedropper"), icon: svgWrap('<path d="M12 4l4 4M10.5 5.5l-6 6a2 2 0 0 0-.5 1l-.5 3 3-.5a2 2 0 0 0 1-.5l6-6M13.5 2.5a2.1 2.1 0 0 1 3 3l-1 1-3-3 1-1z"/>') },
+      healing: { name: t("tool_healing"), icon: svgWrap('<rect x="3.5" y="7.5" width="13" height="5" rx="2.5" transform="rotate(-45 10 10)"/><circle cx="10" cy="10" r="0.8" fill="currentColor"/><circle cx="8" cy="8" r="0.8" fill="currentColor"/><circle cx="12" cy="12" r="0.8" fill="currentColor"/>') },
+      brush: { name: t("tool_brush"), icon: svgWrap('<path d="M16.5 3.5a2.12 2.12 0 0 0-3 0L7 10l-1 4 4-1 6.5-6.5a2.12 2.12 0 0 0 0-3zM7 10l3 3M3 17c1.5 0 2.5-.5 3-1.5L5 14.5 3.5 13C2.5 13.5 2 14.5 2 16a1 1 0 0 0 1 1z"/>') },
+      stamp: { name: t("tool_stamp"), icon: svgWrap('<path d="M7 3h6v3H7zM10 6v5M5 11h10v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2zM4 17h12"/>') },
+      "history-brush": { name: t("tool_history_brush"), icon: svgWrap('<path d="M4 8a6 6 0 1 1 1.5 4M4 4v4h4M12 8l4.5-4.5a1.5 1.5 0 0 1 2.1 2.1L14 10"/>') },
+      eraser: { name: t("tool_eraser"), icon: svgWrap('<path d="M14.5 3.5l3 3-9 9H4l-1.5-1.5 8-8 4-2.5zM7.5 10.5l3 3M2 18h16"/>') },
+      gradient: { name: t("tool_gradient"), icon: svgWrap('<rect x="3" y="3" width="14" height="14" rx="2"/><path d="M3 17L17 3M3 11L11 3M9 17L17 9"/>') },
+      bucket: { name: t("tool_bucket"), icon: svgWrap('<path d="M5 9l5-5 5.5 5.5-5 5zM3 11l6.5-6.5M10.5 14.5l-2.5 2.5a2 2 0 0 1-3-3l2.5-2.5M16 14a1.5 1.5 0 1 1-3 0c0-1.5 1.5-3 1.5-3s1.5 1.5 1.5 3z"/>') },
+      dodge: { name: t("tool_dodge"), icon: svgWrap('<circle cx="9" cy="9" r="5"/><path d="M13 13l4.5 4.5"/>') },
+      pen: { name: t("tool_pen"), icon: svgWrap('<path d="M10 2l5 7-3 8-4-2-4 2-3-8 6-7zM10 2v7"/><circle cx="10" cy="11" r="1" fill="currentColor"/>') },
+      text: { name: t("tool_text"), icon: svgWrap('<path d="M4 5h12M10 5v12M7 17h6M4 5v2M16 5v2"/>') },
+      shape: { name: t("tool_shape"), icon: svgWrap('<rect x="3" y="4" width="14" height="12" rx="2"/>') },
+      hand: { name: t("tool_hand"), icon: svgWrap('<path d="M6 10V5a1 1 0 0 1 2 0v4M8 8V4a1 1 0 0 1 2 0v5M10 8V4.5a1 1 0 0 1 2 0V9M12 9V6a1 1 0 0 1 2 0v6c0 3-2 5-5 5s-5-2-5-5v-3a1 1 0 0 1 2 0v2"/>') },
+      zoom: { name: t("tool_zoom"), icon: svgWrap('<circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/>') }
     };
 
-    const meta = toolMeta[tool] || { name: tool, icon: "🛠️" };
-    if (badgeIcon) badgeIcon.innerText = meta.icon;
+    const meta = toolMeta[tool] || { name: tool, icon: svgWrap('<circle cx="10" cy="10" r="5"/>') };
+    if (badgeIcon) badgeIcon.innerHTML = meta.icon;
     if (badgeName) badgeName.innerText = meta.name;
 
     // Render Dynamic Options based on active tool

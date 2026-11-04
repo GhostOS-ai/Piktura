@@ -150,13 +150,9 @@
     <!-- Window Controls & Language Selector -->
     <div class="menubar-right no-drag">
       <div id="lang-switcher-wrap" class="lang-switcher-wrap"></div>
-      <div class="workspace-pill">
-        <span class="ws-dot"></span>
-        <span class="ws-label">Essentials</span>
-      </div>
-      <button class="win-btn minimize-btn" onclick="App.minimizeWindow()" title="Minimize">─</button>
-      <button class="win-btn maximize-btn" onclick="App.toggleMaximize()" title="Zoom / Maximize">□</button>
-      <button class="win-btn close-btn" onclick="App.closeApp()" title="Close">✕</button>
+      <button class="win-btn minimize-btn" onclick="App.minimizeWindow()" data-i18n-title="win_minimize" title="Minimize">─</button>
+      <button class="win-btn maximize-btn" onclick="App.toggleMaximize()" data-i18n-title="win_maximize" title="Zoom / Maximize">□</button>
+      <button class="win-btn close-btn" onclick="App.closeApp()" data-i18n-title="win_close" title="Close">✕</button>
     </div>
   </header>
 
@@ -204,130 +200,130 @@
     <!-- 1. LEFT TOOLBAR (PHOTOSHOP CLASSIC 1/2-COLUMN) -->
     <aside id="ps-toolbar" class="ps-toolbar no-drag">
       <div class="toolbar-header">
-        <button class="toolbar-col-toggle" onclick="Toolbar.toggleColumns()" title="Expand to 2 columns">»</button>
+        <button class="toolbar-col-toggle" onclick="Toolbar.toggleColumns()" data-i18n-title="btn_toolbar_expand" title="Expand to 2 columns">»</button>
       </div>
 
       <div class="tools-grid" id="tools-grid">
         <!-- V: Move -->
-        <button class="tool-btn active" data-tool="move" onclick="Tools.select('move')" title="Move Tool (V)">
-          <span class="tool-icon">✥</span>
+        <button class="tool-btn active" data-tool="move" onclick="Tools.select('move')" data-i18n-title="tool_move" title="Move Tool (V)">
+          <span class="tool-icon"><svg viewBox="0 0 20 20"><path d="M10 2v16M2 10h16M10 2l-2.5 2.5M10 2l2.5 2.5M10 18l-2.5-2.5M10 18l2.5-2.5M2 10l2.5-2.5M2 10l2.5 2.5M18 10l-2.5-2.5M18 10l2.5 2.5"/></svg></span>
         </button>
 
         <!-- M: Rectangular / Elliptical Marquee -->
         <div class="tool-wrapper">
-          <button class="tool-btn" data-tool="marquee" onclick="Tools.select('marquee')" title="Rectangular Marquee Tool (M)">
-            <span class="tool-icon">⬚</span>
+          <button class="tool-btn" data-tool="marquee" onclick="Tools.select('marquee')" data-i18n-title="tool_marquee" title="Rectangular Marquee Tool (M)">
+            <span class="tool-icon"><svg viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="12" rx="1" stroke-dasharray="2.5 2"/></svg></span>
             <span class="flyout-arrow">▾</span>
           </button>
         </div>
 
         <!-- L: Lasso / Polygonal -->
         <div class="tool-wrapper">
-          <button class="tool-btn" data-tool="lasso" onclick="Tools.select('lasso')" title="Lasso Tool (L)">
-            <span class="tool-icon">➰</span>
+          <button class="tool-btn" data-tool="lasso" onclick="Tools.select('lasso')" data-i18n-title="tool_lasso" title="Lasso Tool (L)">
+            <span class="tool-icon"><svg viewBox="0 0 20 20"><path d="M14 6c0-2.2-2.7-3.5-5.5-3.5S3 4.5 3 8s2.5 6 6 6c2.5 0 4.5-1 5.5-3l2.5 6"/></svg></span>
             <span class="flyout-arrow">▾</span>
           </button>
         </div>
 
         <!-- W: Magic Wand / Quick Selection -->
         <div class="tool-wrapper">
-          <button class="tool-btn" data-tool="wand" onclick="Tools.select('wand')" title="Magic Wand Tool (W)">
-            <span class="tool-icon">🪄</span>
+          <button class="tool-btn" data-tool="wand" onclick="Tools.select('wand')" data-i18n-title="tool_wand" title="Magic Wand Tool (W)">
+            <span class="tool-icon"><svg viewBox="0 0 20 20"><path d="M4 16l8.5-8.5M12.5 7.5l2-2a1.4 1.4 0 0 1 2 2l-2 2M15 2v2M14 3h2M7 3v1M6.5 3.5h1M3 8v1M2.5 8.5h1"/></svg></span>
             <span class="flyout-arrow">▾</span>
           </button>
         </div>
 
         <!-- C: Crop -->
-        <button class="tool-btn" data-tool="crop" onclick="Tools.select('crop')" title="Crop Tool (C)">
-          <span class="tool-icon">⯐</span>
+        <button class="tool-btn" data-tool="crop" onclick="Tools.select('crop')" data-i18n-title="tool_crop" title="Crop Tool (C)">
+          <span class="tool-icon"><svg viewBox="0 0 20 20"><path d="M6 2v12h12M2 6h12v12M14 2v4M18 6h-4"/></svg></span>
         </button>
 
         <!-- I: Eyedropper -->
-        <button class="tool-btn" data-tool="eyedropper" onclick="Tools.select('eyedropper')" title="Eyedropper Tool (I)">
-          <span class="tool-icon">💧</span>
+        <button class="tool-btn" data-tool="eyedropper" onclick="Tools.select('eyedropper')" data-i18n-title="tool_eyedropper" title="Eyedropper Tool (I)">
+          <span class="tool-icon"><svg viewBox="0 0 20 20"><path d="M12 4l4 4M10.5 5.5l-6 6a2 2 0 0 0-.5 1l-.5 3 3-.5a2 2 0 0 0 1-.5l6-6M13.5 2.5a2.1 2.1 0 0 1 3 3l-1 1-3-3 1-1z"/></svg></span>
         </button>
 
         <!-- J: Healing Brush -->
-        <button class="tool-btn" data-tool="healing" onclick="Tools.select('healing')" title="Spot Healing Brush (J)">
-          <span class="tool-icon">🩹</span>
+        <button class="tool-btn" data-tool="healing" onclick="Tools.select('healing')" data-i18n-title="tool_healing" title="Spot Healing Brush (J)">
+          <span class="tool-icon"><svg viewBox="0 0 20 20"><rect x="3.5" y="7.5" width="13" height="5" rx="2.5" transform="rotate(-45 10 10)"/><circle cx="10" cy="10" r="0.8" fill="currentColor"/><circle cx="8" cy="8" r="0.8" fill="currentColor"/><circle cx="12" cy="12" r="0.8" fill="currentColor"/></svg></span>
         </button>
 
         <!-- B: Brush -->
-        <button class="tool-btn" data-tool="brush" onclick="Tools.select('brush')" title="Brush Tool (B)">
-          <span class="tool-icon">🖌️</span>
+        <button class="tool-btn" data-tool="brush" onclick="Tools.select('brush')" data-i18n-title="tool_brush" title="Brush Tool (B)">
+          <span class="tool-icon"><svg viewBox="0 0 20 20"><path d="M16.5 3.5a2.12 2.12 0 0 0-3 0L7 10l-1 4 4-1 6.5-6.5a2.12 2.12 0 0 0 0-3zM7 10l3 3M3 17c1.5 0 2.5-.5 3-1.5L5 14.5 3.5 13C2.5 13.5 2 14.5 2 16a1 1 0 0 0 1 1z"/></svg></span>
         </button>
 
         <!-- S: Clone Stamp -->
-        <button class="tool-btn" data-tool="stamp" onclick="Tools.select('stamp')" title="Clone Stamp Tool (S)">
-          <span class="tool-icon">⚚</span>
+        <button class="tool-btn" data-tool="stamp" onclick="Tools.select('stamp')" data-i18n-title="tool_stamp" title="Clone Stamp Tool (S)">
+          <span class="tool-icon"><svg viewBox="0 0 20 20"><path d="M7 3h6v3H7zM10 6v5M5 11h10v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2zM4 17h12"/></svg></span>
         </button>
 
         <!-- Y: History Brush -->
-        <button class="tool-btn" data-tool="history-brush" onclick="Tools.select('history-brush')" title="History Brush Tool (Y)">
-          <span class="tool-icon">📜</span>
+        <button class="tool-btn" data-tool="history-brush" onclick="Tools.select('history-brush')" data-i18n-title="tool_history_brush" title="History Brush Tool (Y)">
+          <span class="tool-icon"><svg viewBox="0 0 20 20"><path d="M4 8a6 6 0 1 1 1.5 4M4 4v4h4M12 8l4.5-4.5a1.5 1.5 0 0 1 2.1 2.1L14 10"/></svg></span>
         </button>
 
         <!-- E: Eraser -->
-        <button class="tool-btn" data-tool="eraser" onclick="Tools.select('eraser')" title="Eraser Tool (E)">
-          <span class="tool-icon">🧹</span>
+        <button class="tool-btn" data-tool="eraser" onclick="Tools.select('eraser')" data-i18n-title="tool_eraser" title="Eraser Tool (E)">
+          <span class="tool-icon"><svg viewBox="0 0 20 20"><path d="M14.5 3.5l3 3-9 9H4l-1.5-1.5 8-8 4-2.5zM7.5 10.5l3 3M2 18h16"/></svg></span>
         </button>
 
         <!-- G: Paint Bucket & Gradient -->
         <div class="tool-wrapper">
-          <button class="tool-btn" data-tool="bucket" onclick="Tools.select('bucket')" title="Paint Bucket Tool (G)">
-            <span class="tool-icon">🪣</span>
+          <button class="tool-btn" data-tool="bucket" onclick="Tools.select('bucket')" data-i18n-title="tool_bucket" title="Paint Bucket Tool (G)">
+            <span class="tool-icon"><svg viewBox="0 0 20 20"><path d="M5 9l5-5 5.5 5.5-5 5zM3 11l6.5-6.5M10.5 14.5l-2.5 2.5a2 2 0 0 1-3-3l2.5-2.5M16 14a1.5 1.5 0 1 1-3 0c0-1.5 1.5-3 1.5-3s1.5 1.5 1.5 3z"/></svg></span>
           </button>
         </div>
         <div class="tool-wrapper">
-          <button class="tool-btn" data-tool="gradient" onclick="Tools.select('gradient')" title="Gradient Tool (G)">
-            <span class="tool-icon">▨</span>
+          <button class="tool-btn" data-tool="gradient" onclick="Tools.select('gradient')" data-i18n-title="tool_gradient" title="Gradient Tool (G)">
+            <span class="tool-icon"><svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M3 17L17 3M3 11L11 3M9 17L17 9"/></svg></span>
           </button>
         </div>
 
         <!-- O: Dodge / Burn / Sponge -->
         <div class="tool-wrapper">
-          <button class="tool-btn" data-tool="dodge" onclick="Tools.select('dodge')" title="Dodge & Burn Tool (O)">
-            <span class="tool-icon">☀️</span>
+          <button class="tool-btn" data-tool="dodge" onclick="Tools.select('dodge')" data-i18n-title="tool_dodge" title="Dodge & Burn Tool (O)">
+            <span class="tool-icon"><svg viewBox="0 0 20 20"><circle cx="9" cy="9" r="5"/><path d="M13 13l4.5 4.5"/></svg></span>
             <span class="flyout-arrow">▾</span>
           </button>
         </div>
 
         <!-- P: Pen Tool (Vector Bezier) -->
-        <button class="tool-btn" data-tool="pen" onclick="Tools.select('pen')" title="Pen Tool (P)">
-          <span class="tool-icon">✒️</span>
+        <button class="tool-btn" data-tool="pen" onclick="Tools.select('pen')" data-i18n-title="tool_pen" title="Pen Tool (P)">
+          <span class="tool-icon"><svg viewBox="0 0 20 20"><path d="M10 2l5 7-3 8-4-2-4 2-3-8 6-7zM10 2v7"/><circle cx="10" cy="11" r="1" fill="currentColor"/></svg></span>
         </button>
 
         <!-- T: Horizontal Type Tool -->
-        <button class="tool-btn" data-tool="text" onclick="Tools.select('text')" title="Horizontal Type Tool (T)">
-          <span class="tool-icon">T</span>
+        <button class="tool-btn" data-tool="text" onclick="Tools.select('text')" data-i18n-title="tool_text" title="Horizontal Type Tool (T)">
+          <span class="tool-icon"><svg viewBox="0 0 20 20"><path d="M4 5h12M10 5v12M7 17h6M4 5v2M16 5v2"/></svg></span>
         </button>
 
         <!-- U: Shape Tools (Rect / Ellipse) -->
         <div class="tool-wrapper">
-          <button class="tool-btn" data-tool="shape" onclick="Tools.select('shape')" title="Rectangle & Vector Shape Tool (U)">
-            <span class="tool-icon">▭</span>
+          <button class="tool-btn" data-tool="shape" onclick="Tools.select('shape')" data-i18n-title="tool_shape" title="Rectangle & Vector Shape Tool (U)">
+            <span class="tool-icon"><svg viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="12" rx="2"/></svg></span>
             <span class="flyout-arrow">▾</span>
           </button>
         </div>
 
         <!-- H: Hand Tool -->
-        <button class="tool-btn" data-tool="hand" onclick="Tools.select('hand')" title="Hand Tool (H / Space)">
-          <span class="tool-icon">✋</span>
+        <button class="tool-btn" data-tool="hand" onclick="Tools.select('hand')" data-i18n-title="tool_hand" title="Hand Tool (H / Space)">
+          <span class="tool-icon"><svg viewBox="0 0 20 20"><path d="M6 10V5a1 1 0 0 1 2 0v4M8 8V4a1 1 0 0 1 2 0v5M10 8V4.5a1 1 0 0 1 2 0V9M12 9V6a1 1 0 0 1 2 0v6c0 3-2 5-5 5s-5-2-5-5v-3a1 1 0 0 1 2 0v2"/></svg></span>
         </button>
 
         <!-- Z: Zoom Tool -->
-        <button class="tool-btn" data-tool="zoom" onclick="Tools.select('zoom')" title="Zoom Tool (Z)">
-          <span class="tool-icon">🔍</span>
+        <button class="tool-btn" data-tool="zoom" onclick="Tools.select('zoom')" data-i18n-title="tool_zoom" title="Zoom Tool (Z)">
+          <span class="tool-icon"><svg viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg></span>
         </button>
       </div>
 
       <!-- Foreground & Background Color Chips (Photoshop Iconic Palette) -->
       <div class="toolbar-color-section">
-        <button class="color-reset-btn" onclick="ColorPicker.resetDefaultColors()" title="Default Foreground/Background Colors (D)">◲</button>
-        <button class="color-swap-btn" onclick="ColorPicker.swapColors()" title="Switch Foreground/Background Colors (X)">⇄</button>
+        <button class="color-reset-btn" onclick="ColorPicker.resetDefaultColors()" data-i18n-title="tool_default_colors" title="Default Colors (D)">◲</button>
+        <button class="color-swap-btn" onclick="ColorPicker.swapColors()" data-i18n-title="tool_swap_colors" title="Switch Colors (X)">⇄</button>
         <div class="color-chips-box">
-          <div id="chip-fg" class="color-chip fg" style="background-color: #000000;" onclick="ColorPicker.openModal('fg')" title="Foreground Color"></div>
-          <div id="chip-bg" class="color-chip bg" style="background-color: #ffffff;" onclick="ColorPicker.openModal('bg')" title="Background Color"></div>
+          <div id="chip-fg" class="color-chip fg" style="background-color: #000000;" onclick="ColorPicker.openModal('fg')" data-i18n-title="tool_fg_color" title="Foreground Color"></div>
+          <div id="chip-bg" class="color-chip bg" style="background-color: #ffffff;" onclick="ColorPicker.openModal('bg')" data-i18n-title="tool_bg_color" title="Background Color"></div>
         </div>
       </div>
     </aside>

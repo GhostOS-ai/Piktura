@@ -50,4 +50,17 @@ app = BUNDLE(
     name='Piktura.app',
     icon='assets/Piktura.icns',
     bundle_identifier='best.kib.piktura',
+    info_plist={
+        'CFBundleDisplayName': 'Piktura',
+        'CFBundleName': 'Piktura',
+        'CFBundleIdentifier': 'best.kib.piktura',
+        'CFBundleVersion': '1.1.1',
+        'CFBundleShortVersionString': '1.1.1',
+        'LSMinimumSystemVersion': '11.0',
+        'CFBundleSupportedPlatforms': ['MacOSX'],
+        'NSHighResolutionCapable': True,
+        'LSApplicationCategoryType': 'public.app-category.graphics-design',
+        'CFBundleIconFile': 'Piktura.icns',
+        'CFBundleIconName': 'Piktura',
+    }
 )
