@@ -88,12 +88,10 @@ html, body {
 .ps-brand-icon-img {
   width: 20px;
   height: 20px;
-  border-radius: 5px;
-  background: #000000;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+  background: transparent;
   display: inline-block;
   vertical-align: middle;
-  object-fit: cover;
+  object-fit: contain;
   flex-shrink: 0;
   border: none;
   outline: none;
@@ -557,11 +555,10 @@ html, body {
 .about-logo-big {
   width: 88px;
   height: 88px;
-  border-radius: 20px;
-  background: #000000;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.85);
+  background: transparent;
   margin: 0 auto 14px;
   display: block;
+  object-fit: contain;
   border: none;
   outline: none;
 }
