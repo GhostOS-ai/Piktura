@@ -292,8 +292,15 @@ const Canvas = {
     this.rulersVisible = !this.rulersVisible;
     const rH = document.getElementById("ruler-h");
     const rV = document.getElementById("ruler-v");
+    const rC = document.querySelector(".ruler-corner");
+    const stage = document.getElementById("canvas-stage");
     if (rH) rH.style.display = this.rulersVisible ? "block" : "none";
     if (rV) rV.style.display = this.rulersVisible ? "block" : "none";
+    if (rC) rC.style.display = this.rulersVisible ? "flex" : "none";
+    if (stage) {
+      stage.style.top = this.rulersVisible ? "46px" : "28px";
+      stage.style.left = this.rulersVisible ? "18px" : "0";
+    }
     this.drawRulers();
   },
 

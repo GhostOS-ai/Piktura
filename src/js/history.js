@@ -45,6 +45,10 @@ const History = {
       this.currentIndex++;
     }
 
+    if (window.Documents) {
+      Documents.markActiveDocDirty();
+    }
+
     this.renderHistoryPanel();
   },
 
@@ -66,6 +70,9 @@ const History = {
       const targetState = this.stack[this.currentIndex];
       if (window.Layers && targetState.snapshot) {
         Layers.deserialize(targetState.snapshot);
+      }
+      if (window.Documents) {
+        Documents.markActiveDocDirty();
       }
       this.renderHistoryPanel();
       if (window.Canvas) {

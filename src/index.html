@@ -319,6 +319,12 @@
 
     <!-- 2. CENTER CANVAS VIEWPORT -->
     <div id="ps-viewport" class="ps-viewport">
+      <!-- Multi-Document Tabs Bar (Browser / Photoshop Style) -->
+      <div id="ps-doc-tabs-bar" class="ps-doc-tabs-bar">
+        <div id="ps-doc-tabs-list" class="ps-doc-tabs-list"></div>
+        <button id="btn-new-tab" class="doc-tab-new-btn" title="New Document (⌘N)" onclick="App.newDocumentDialog()">+</button>
+      </div>
+
       <!-- Horizontal Ruler -->
       <div id="ruler-h" class="ruler-horizontal">
         <canvas id="ruler-h-canvas"></canvas>
@@ -656,6 +662,27 @@
     </div>
   </div>
 
+  <!-- ==================== CLOSE CONFIRM MODAL ==================== -->
+  <div id="modal-close-confirm" class="ps-modal hidden">
+    <div class="modal-backdrop" onclick="Documents.cancelClose()"></div>
+    <div class="modal-window" style="width: 440px;">
+      <div class="modal-header">
+        <h3 id="close-confirm-title">Save changes?</h3>
+        <button class="modal-close-btn" onclick="Documents.cancelClose()">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 18px 22px;">
+        <p id="close-confirm-msg" style="color: #cbd5e1; font-size: 13.5px; line-height: 1.5; margin: 0;">
+          Save changes to the document before closing?
+        </p>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 14px 22px;">
+        <button class="ps-btn" onclick="Documents.cancelClose()" id="btn-close-cancel">Cancel</button>
+        <button class="ps-btn" onclick="Documents.confirmCloseDontSave()" id="btn-close-dont-save" style="color: #f87171; border-color: rgba(239,68,68,0.35);">Don't Save</button>
+        <button class="ps-btn primary" onclick="Documents.confirmCloseSave()" id="btn-close-save">Save</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== ABOUT & BRAND DASHBOARD MODAL ==================== -->
   <div id="modal-about" class="ps-modal hidden">
     <div class="modal-backdrop" onclick="App.closeAboutModal()"></div>
@@ -667,7 +694,7 @@
       <div class="modal-body" style="text-align: center; padding: 26px 20px 20px;">
         <img src="assets/icon.png" class="about-logo-big" alt="Piktura Studio">
         <h2 class="about-app-title">Piktura Studio</h2>
-        <div class="about-version-badge">v1.1.5 • Apple Silicon Native</div>
+        <div class="about-version-badge">v1.1.6 • Apple Silicon Native</div>
         <p class="about-tagline-text" data-i18n="about_tagline">Next-Gen Professional Creative Suite</p>
         <div class="about-pills">
           <span class="about-pill">⚡ Metal GPU</span>
@@ -706,6 +733,7 @@
   <script src="js/canvas.js"></script>
   <script src="js/tools.js"></script>
   <script src="js/filters.js"></script>
+  <script src="js/documents.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

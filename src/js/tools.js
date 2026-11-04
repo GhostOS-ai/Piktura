@@ -762,26 +762,28 @@ const Tools = {
       if (!activeLayer || !activeLayer.visible || activeLayer.locked) return;
 
       this.isDrawing = true;
+      const lx = coords.x - (activeLayer.x || 0);
+      const ly = coords.y - (activeLayer.y || 0);
 
       if (this.currentTool === "brush") {
-        this.paintDot(activeLayer.ctx, coords.x, coords.y, ColorPicker.getFgColor());
+        this.paintDot(activeLayer.ctx, lx, ly, ColorPicker.getFgColor());
       } else if (this.currentTool === "eraser") {
-        this.eraseDot(activeLayer.ctx, coords.x, coords.y);
+        this.eraseDot(activeLayer.ctx, lx, ly);
       } else if (this.currentTool === "stamp") {
         if (!this.cloneSource) {
-          this.cloneSource = { x: coords.x, y: coords.y };
+          this.cloneSource = { x: lx, y: ly };
         }
-        this.stampDot(activeLayer.ctx, coords.x, coords.y);
+        this.stampDot(activeLayer.ctx, lx, ly);
       } else if (this.currentTool === "healing") {
-        this.healingDot(activeLayer.ctx, coords.x, coords.y);
+        this.healingDot(activeLayer.ctx, lx, ly);
       } else if (this.currentTool === "blur-sharpen") {
-        this.blurSharpenDot(activeLayer.ctx, coords.x, coords.y);
+        this.blurSharpenDot(activeLayer.ctx, lx, ly);
       } else if (this.currentTool === "bucket") {
-        this.floodFill(activeLayer.ctx, Math.round(coords.x), Math.round(coords.y), ColorPicker.getFgColor());
+        this.floodFill(activeLayer.ctx, Math.round(lx), Math.round(ly), ColorPicker.getFgColor());
         Layers.renderLayersPanel();
         History.pushState("action_paint_bucket", null, "bucket");
       } else if (this.currentTool === "dodge") {
-        this.applyDodgeBurn(activeLayer.ctx, coords.x, coords.y);
+        this.applyDodgeBurn(activeLayer.ctx, lx, ly);
       }
     });
 
@@ -861,18 +863,23 @@ const Tools = {
       const activeLayer = Layers.getActiveLayer();
       if (!activeLayer || activeLayer.locked) return;
 
+      const prevLx = this.lastX - (activeLayer.x || 0);
+      const prevLy = this.lastY - (activeLayer.y || 0);
+      const currLx = coords.x - (activeLayer.x || 0);
+      const currLy = coords.y - (activeLayer.y || 0);
+
       if (this.currentTool === "brush") {
-        this.paintLine(activeLayer.ctx, this.lastX, this.lastY, coords.x, coords.y, ColorPicker.getFgColor());
+        this.paintLine(activeLayer.ctx, prevLx, prevLy, currLx, currLy, ColorPicker.getFgColor());
       } else if (this.currentTool === "eraser") {
-        this.eraseLine(activeLayer.ctx, this.lastX, this.lastY, coords.x, coords.y);
+        this.eraseLine(activeLayer.ctx, prevLx, prevLy, currLx, currLy);
       } else if (this.currentTool === "stamp") {
-        this.stampLine(activeLayer.ctx, this.lastX, this.lastY, coords.x, coords.y);
+        this.stampLine(activeLayer.ctx, prevLx, prevLy, currLx, currLy);
       } else if (this.currentTool === "healing") {
-        this.healingLine(activeLayer.ctx, this.lastX, this.lastY, coords.x, coords.y);
+        this.healingLine(activeLayer.ctx, prevLx, prevLy, currLx, currLy);
       } else if (this.currentTool === "blur-sharpen") {
-        this.blurSharpenLine(activeLayer.ctx, this.lastX, this.lastY, coords.x, coords.y);
+        this.blurSharpenLine(activeLayer.ctx, prevLx, prevLy, currLx, currLy);
       } else if (this.currentTool === "dodge") {
-        this.applyDodgeBurn(activeLayer.ctx, coords.x, coords.y);
+        this.applyDodgeBurn(activeLayer.ctx, currLx, currLy);
       }
 
       this.lastX = coords.x;
@@ -1248,15 +1255,12 @@ const Tools = {
     }
   },
 
-  // Shift Layer Canvas for Move Tool
+  // Non-destructive Layer Movement for Move Tool (Zero Pixel Loss!)
   shiftLayerCanvas(layer, dx, dy) {
-    const temp = document.createElement("canvas");
-    temp.width = layer.width;
-    temp.height = layer.height;
-    temp.getContext("2d").drawImage(layer.canvas, 0, 0);
-
-    layer.ctx.clearRect(0, 0, layer.width, layer.height);
-    layer.ctx.drawImage(temp, dx, dy);
+    if (!layer) return;
+    layer.x = (layer.x || 0) + dx;
+    layer.y = (layer.y || 0) + dy;
+    layer.canvas.style.transform = `translate(${Math.round(layer.x)}px, ${Math.round(layer.y)}px)`;
 
     // Keep text coordinates in sync when layer is moved!
     if (layer.isTextLayer && layer.textData) {

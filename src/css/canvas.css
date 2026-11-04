@@ -8,10 +8,137 @@
   overflow: hidden;
 }
 
+/* Multi-Document Tabs Bar (Browser / Photoshop Style) */
+.ps-doc-tabs-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 28px;
+  background: #14161f;
+  border-bottom: 1px solid #232733;
+  display: flex;
+  align-items: stretch;
+  z-index: 55;
+  user-select: none;
+  font-family: var(--ps-font-sans);
+}
+
+.ps-doc-tabs-list {
+  display: flex;
+  align-items: stretch;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  flex: 1 1 auto;
+}
+
+.ps-doc-tabs-list::-webkit-scrollbar {
+  display: none;
+}
+
+.doc-tab-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 12px;
+  background: #181a24;
+  color: #94a3b8;
+  border-right: 1px solid #232733;
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  max-width: 240px;
+  position: relative;
+  transition: background 0.15s, color 0.15s;
+}
+
+.doc-tab-item:hover {
+  background: #1f2330;
+  color: #e2e8f0;
+}
+
+.doc-tab-item.active {
+  background: #252837;
+  color: #ffffff;
+  border-bottom: 2px solid #3b82f6;
+  font-weight: 600;
+}
+
+.doc-tab-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.doc-tab-zoom-badge {
+  font-size: 10px;
+  opacity: 0.65;
+  font-family: var(--ps-font-mono);
+}
+
+.doc-tab-dirty-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #60a5fa;
+  flex-shrink: 0;
+  display: none;
+}
+
+.doc-tab-item.is-dirty .doc-tab-dirty-dot {
+  display: inline-block;
+}
+
+.doc-tab-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 2px;
+  transition: background 0.12s, color 0.12s;
+}
+
+.doc-tab-close-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  color: #ef4444;
+}
+
+.doc-tab-new-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  border-right: 1px solid #232733;
+  color: #94a3b8;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.doc-tab-new-btn:hover {
+  background: #1f2330;
+  color: #3b82f6;
+}
+
 /* Rulers */
 .ruler-corner {
   position: absolute;
-  top: 0;
+  top: 28px;
   left: 0;
   width: 18px;
   height: 18px;
@@ -29,7 +156,7 @@
 
 .ruler-horizontal {
   position: absolute;
-  top: 0;
+  top: 28px;
   left: 18px;
   right: 0;
   height: 18px;
@@ -42,7 +169,7 @@
 
 .ruler-vertical {
   position: absolute;
-  top: 18px;
+  top: 46px;
   left: 0;
   bottom: 24px;
   width: 18px;
@@ -61,7 +188,7 @@
 /* Canvas Scroll Stage */
 .canvas-stage {
   position: absolute;
-  top: 18px;
+  top: 46px;
   left: 18px;
   right: 0;
   bottom: 24px;

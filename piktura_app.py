@@ -85,7 +85,10 @@ def get_resource_path(relative_str):
     return base / relative_str
 
 def set_macos_dock_icon():
-    if sys.platform == "darwin":
+    # In frozen .app bundles, macOS Info.plist (CFBundleIconFile -> Piktura.icns)
+    # renders the dock tile natively with system-level HIG metrics.
+    # We only set applicationIconImage when running in unfrozen development mode:
+    if sys.platform == "darwin" and not getattr(sys, "frozen", False):
         try:
             from AppKit import NSApplication, NSImage
             app = NSApplication.sharedApplication()

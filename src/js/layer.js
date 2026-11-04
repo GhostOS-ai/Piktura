@@ -16,6 +16,10 @@ class Layer {
     this.textData = null;
     this.mask = null; // Optional grayscale mask canvas
 
+    // Non-destructive positional offset
+    this.x = 0;
+    this.y = 0;
+
     // The offscreen render canvas for this layer's pixel content
     this.canvas = document.createElement("canvas");
     this.canvas.width = width;
@@ -56,6 +60,8 @@ class Layer {
     copy.visible = this.visible;
     copy.isTextLayer = this.isTextLayer;
     copy.textData = this.textData ? JSON.parse(JSON.stringify(this.textData)) : null;
+    copy.x = this.x;
+    copy.y = this.y;
     copy.ctx.drawImage(this.canvas, 0, 0);
     return copy;
   }
@@ -101,6 +107,7 @@ const Layers = {
       layer.canvas.style.opacity = layer.opacity;
       layer.canvas.style.mixBlendMode = layer.blendMode;
       layer.canvas.style.display = layer.visible ? "block" : "none";
+      layer.canvas.style.transform = `translate(${Math.round(layer.x || 0)}px, ${Math.round(layer.y || 0)}px)`;
       container.appendChild(layer.canvas);
     });
   },
@@ -185,7 +192,7 @@ const Layers = {
     bottomLayer.ctx.save();
     bottomLayer.ctx.globalAlpha = topLayer.opacity;
     bottomLayer.ctx.globalCompositeOperation = topLayer.blendMode === "normal" ? "source-over" : topLayer.blendMode;
-    bottomLayer.ctx.drawImage(topLayer.canvas, 0, 0);
+    bottomLayer.ctx.drawImage(topLayer.canvas, Math.round(topLayer.x || 0), Math.round(topLayer.y || 0));
     bottomLayer.ctx.restore();
 
     this.layers.splice(this.activeLayerIndex, 1);
@@ -204,7 +211,7 @@ const Layers = {
         merged.ctx.save();
         merged.ctx.globalAlpha = layer.opacity;
         merged.ctx.globalCompositeOperation = layer.blendMode === "normal" ? "source-over" : layer.blendMode;
-        merged.ctx.drawImage(layer.canvas, 0, 0);
+        merged.ctx.drawImage(layer.canvas, Math.round(layer.x || 0), Math.round(layer.y || 0));
         merged.ctx.restore();
       }
     });
@@ -223,7 +230,7 @@ const Layers = {
         flattened.ctx.save();
         flattened.ctx.globalAlpha = layer.opacity;
         flattened.ctx.globalCompositeOperation = layer.blendMode === "normal" ? "source-over" : layer.blendMode;
-        flattened.ctx.drawImage(layer.canvas, 0, 0);
+        flattened.ctx.drawImage(layer.canvas, Math.round(layer.x || 0), Math.round(layer.y || 0));
         flattened.ctx.restore();
       }
     });
@@ -354,6 +361,8 @@ const Layers = {
       opacity: layer.opacity,
       blendMode: layer.blendMode,
       visible: layer.visible,
+      x: layer.x || 0,
+      y: layer.y || 0,
       isTextLayer: !!layer.isTextLayer,
       textData: layer.textData ? JSON.parse(JSON.stringify(layer.textData)) : null,
       dataUrl: layer.canvas.toDataURL("image/png")
@@ -371,6 +380,8 @@ const Layers = {
       layer.opacity = item.opacity;
       layer.blendMode = item.blendMode;
       layer.visible = item.visible;
+      layer.x = item.x || 0;
+      layer.y = item.y || 0;
       layer.isTextLayer = !!item.isTextLayer;
       layer.textData = item.textData || null;
 
@@ -380,6 +391,7 @@ const Layers = {
         layer.canvas.style.opacity = layer.opacity;
         layer.canvas.style.mixBlendMode = layer.blendMode;
         layer.canvas.style.display = layer.visible ? "block" : "none";
+        layer.canvas.style.transform = `translate(${Math.round(layer.x)}px, ${Math.round(layer.y)}px)`;
         this.renderLayersPanel();
       };
       img.src = item.dataUrl;

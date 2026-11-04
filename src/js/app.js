@@ -2,15 +2,19 @@
  * Piktura Studio — Core Application Coordinator & Menus
  */
 const App = {
-  version: "1.1.5",
+  version: "1.1.6",
 
   init() {
     I18n.init();
     ColorPicker.init();
-    Layers.init(1920, 1080, "white");
-    History.pushState("new_document", null, "document");
     Canvas.init();
     Tools.init();
+    if (window.Documents) {
+      Documents.init();
+    } else {
+      Layers.init(1920, 1080, "white");
+      History.pushState("new_document", null, "document");
+    }
     this.setupGlobalKeyboardShortcuts();
     Canvas.fitToScreen();
     console.log(`Piktura Studio v${this.version} initialized successfully.`);
@@ -90,6 +94,9 @@ const App = {
       } else if (cmd && shift && e.code === "KeyS") {
         e.preventDefault();
         this.exportAsDialog();
+      } else if (cmd && !shift && !alt && e.code === "KeyW") {
+        e.preventDefault();
+        this.closeDocument();
       } else if (cmd && alt && shift && e.code === "KeyW") {
         e.preventDefault();
         this.exportAsDialog();
@@ -238,10 +245,14 @@ const App = {
     const bg = document.getElementById("new-doc-bg").value;
 
     this.closeNewDocumentDialog();
-    Layers.init(w, h, bg);
-    History.stack = [];
-    History.currentIndex = -1;
-    History.pushState("New Document");
+    if (window.Documents) {
+      Documents.createDocument(null, w, h, bg, true);
+    } else {
+      Layers.init(w, h, bg);
+      History.stack = [];
+      History.currentIndex = -1;
+      History.pushState("New Document");
+    }
     Canvas.fitToScreen();
 
     const sizeEl = document.getElementById("status-doc-size");
@@ -261,22 +272,27 @@ const App = {
     reader.onload = (event) => {
       const img = new Image();
       img.onload = () => {
-        Layers.init(img.width, img.height, "transparent");
-        const active = Layers.getActiveLayer();
-        active.ctx.drawImage(img, 0, 0);
+        if (window.Documents) {
+          Documents.openImageDocument(file, img);
+        } else {
+          Layers.init(img.width, img.height, "transparent");
+          const active = Layers.getActiveLayer();
+          active.ctx.drawImage(img, 0, 0);
 
-        History.stack = [];
-        History.currentIndex = -1;
-        History.pushState(`Open ${file.name}`);
-        Canvas.fitToScreen();
-        Layers.renderLayersPanel();
+          History.stack = [];
+          History.currentIndex = -1;
+          History.pushState(`Open ${file.name}`);
+          Canvas.fitToScreen();
+          Layers.renderLayersPanel();
 
-        const sizeEl = document.getElementById("status-doc-size");
-        if (sizeEl) sizeEl.innerText = `${img.width} × ${img.height} px`;
+          const sizeEl = document.getElementById("status-doc-size");
+          if (sizeEl) sizeEl.innerText = `${img.width} × ${img.height} px`;
+        }
       };
       img.src = event.target.result;
     };
     reader.readAsDataURL(file);
+    e.target.value = "";
   },
 
   // Export As Dialog & Engine
@@ -331,7 +347,7 @@ const App = {
         ctx.save();
         ctx.globalAlpha = l.opacity;
         ctx.globalCompositeOperation = l.blendMode === "normal" ? "source-over" : l.blendMode;
-        ctx.drawImage(l.canvas, 0, 0);
+        ctx.drawImage(l.canvas, Math.round(l.x || 0), Math.round(l.y || 0));
         ctx.restore();
       }
     });
@@ -341,10 +357,16 @@ const App = {
 
     const a = document.createElement("a");
     a.href = dataUrl;
-    a.download = `piktura-export.${format === "jpeg" ? "jpg" : format}`;
+    const activeDoc = (window.Documents && Documents.getActiveDoc());
+    const baseName = (activeDoc && activeDoc.title) ? activeDoc.title.replace(/\.[^/.]+$/, "") : "piktura-export";
+    a.download = `${baseName}.${format === "jpeg" ? "jpg" : format}`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+
+    if (window.Documents) {
+      Documents.markActiveDocSaved();
+    }
   },
 
   saveProject() {
@@ -356,13 +378,18 @@ const App = {
   },
 
   closeDocument() {
-    if (confirm("Close active document?")) {
+    if (window.Documents) {
+      Documents.requestCloseDocument();
+    } else {
       this.confirmNewDocument();
     }
   },
 
   closeAllModals() {
-    document.querySelectorAll(".ps-modal").forEach(m => m.classList.add("hidden"));
+    document.querySelectorAll(".ps-modal, .ps-modal-backdrop").forEach(m => m.classList.add("hidden"));
+    if (window.Documents) {
+      Documents.pendingCloseDocId = null;
+    }
   },
 
   showAboutModal() {
