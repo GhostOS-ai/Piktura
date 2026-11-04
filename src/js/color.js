@@ -158,3 +158,5 @@ const ColorPicker = {
     this.updateChips();
   }
 };
+
+window.ColorPicker = ColorPicker;

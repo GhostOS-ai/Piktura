@@ -288,20 +288,19 @@
 /* Interactive Photoshop-Grade Inline Canvas Text Editor */
 .canvas-text-editor {
   position: absolute;
-  min-width: 120px;
-  min-height: 34px;
+  min-width: 60px;
+  min-height: 28px;
   border: 1.5px dashed #3b82f6;
-  background: rgba(18, 20, 26, 0.88);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.15);
-  padding: 6px 10px;
+  background: transparent;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+  padding: 4px 8px;
   outline: none;
   white-space: pre-wrap;
   word-break: break-word;
   cursor: text;
   z-index: 500;
   border-radius: 4px;
-  caret-color: #60a5fa;
+  caret-color: currentColor;
   transform-origin: top left;
   line-height: 1.25;
 }

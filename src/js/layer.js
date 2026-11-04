@@ -116,7 +116,7 @@ const Layers = {
     }
   },
 
-  createLayer(name = null) {
+  createLayer(name = null, pushHistory = true) {
     const layerNum = this.layers.length;
     const layer = new Layer(name || `Layer ${layerNum}`, this.docWidth, this.docHeight);
     
@@ -127,7 +127,9 @@ const Layers = {
 
     this.mountToDOM();
     this.renderLayersPanel();
-    History.pushState("action_new_layer", null, "layer");
+    if (pushHistory) {
+      History.pushState("action_new_layer", null, "layer");
+    }
     return layer;
   },
 

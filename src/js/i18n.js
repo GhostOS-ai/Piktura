@@ -124,6 +124,11 @@ const I18n = {
       opt_exposure: "Exposure:",
       opt_font: "Font:",
       opt_style: "Style:",
+      opt_text_color: "Color:",
+      opt_text_bg: "Background:",
+      opt_commit: "Commit",
+      opt_cancel: "Cancel",
+      opt_none: "None",
 
       // Panels
       panel_color: "COLOR",
@@ -299,6 +304,11 @@ const I18n = {
       opt_exposure: "Экспозиция:",
       opt_font: "Шрифт:",
       opt_style: "Стиль:",
+      opt_text_color: "Цвет:",
+      opt_text_bg: "Фон текста:",
+      opt_commit: "Применить",
+      opt_cancel: "Отмена",
+      opt_none: "Без фона",
 
       // Панели
       panel_color: "ЦВЕТ",
@@ -474,6 +484,11 @@ const I18n = {
       opt_exposure: "Экспозиция:",
       opt_font: "Қаріп:",
       opt_style: "Стилі:",
+      opt_text_color: "Түсі:",
+      opt_text_bg: "Мәтін аясы:",
+      opt_commit: "Қолдану",
+      opt_cancel: "Болдырмау",
+      opt_none: "Аясыз",
 
       // Панельдер
       panel_color: "ТҮС",

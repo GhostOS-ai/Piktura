@@ -1,5 +1,5 @@
 /**
- * Piktura Studio — Tool Engine & Professional Pipeline (v1.1.2)
+ * Piktura Studio — Tool Engine & Professional Pipeline (v1.1.4)
  * Complete Photoshop-Grade Tool Mechanics, Visual Canvas Indicators & Localized History
  */
 const Tools = {
@@ -66,10 +66,12 @@ const Tools = {
   fontWeight: "normal",   // "normal" | "bold"
   fontStyle: "normal",    // "normal" | "italic"
   textAlign: "left",      // "left" | "center" | "right"
-  fontColor: null,        // hex string or null (defaults to fgColor)
+  fontColor: "#000000",   // Default black so text is immediately visible on white canvas
+  textBgColor: "transparent", // Default transparent (no background)
   textEditing: false,
   textX: 0,
   textY: 0,
+  activeColorPopover: null, // "color" | "bg" | null
 
   // Eyedropper State
   eyedropperSampleSize: 1,
@@ -300,11 +302,10 @@ const Tools = {
         </div>
       `;
     } else if (tool === "text") {
-      const fg = window.ColorPicker ? ColorPicker.getFgColor() : "#ffffff";
       const isBold = this.fontWeight === "bold";
       const isItalic = this.fontStyle === "italic";
       const align = this.textAlign || "left";
-      const activeColor = this.fontColor || fg;
+      const activeColor = this.fontColor || "#000000";
 
       const fonts = [
         // Sans-Serif
@@ -345,15 +346,36 @@ const Tools = {
         return `<option value="${f.val}" ${isSel} style="font-family:${f.val}">${f.name}</option>`;
       }).join("");
 
+      const textColors = [
+        "#000000", "#1f2937", "#4b5563", "#9ca3af", "#d1d5db", "#ffffff",
+        "#ef4444", "#dc2626", "#f97316", "#f59e0b", "#eab308", "#84cc16",
+        "#10b981", "#06b6d4", "#3b82f6", "#6366f1", "#8b5cf6", "#ec4899",
+        "#f43f5e", "#14b8a6", "#0284c7", "#4f46e5", "#7c3aed", "#db2777"
+      ];
+
+      const textBgPresets = [
+        { label: "Dark Glass", val: "rgba(18, 20, 26, 0.85)" },
+        { label: "Light Glass", val: "rgba(255, 255, 255, 0.85)" },
+        { label: "Black", val: "#000000" },
+        { label: "White", val: "#ffffff" },
+        { label: "Yellow", val: "#fde047" },
+        { label: "Red", val: "#ef4444" },
+        { label: "Blue", val: "#3b82f6" },
+        { label: "Green", val: "#10b981" },
+        { label: "Purple", val: "#8b5cf6" },
+        { label: "Orange", val: "#f97316" },
+        { label: "Charcoal", val: "#1e293b" }
+      ];
+
       container.innerHTML = `
         <div class="opt-group" style="display:flex; align-items:center; gap:8px;">
           <label>${t("opt_font")}</label>
-          <select class="ps-select" style="min-width:145px; font-weight:500;" onchange="Tools.setTextFont(this.value)">
+          <select class="ps-select" style="min-width:140px; font-weight:500;" onchange="Tools.setTextFont(this.value)">
             ${fontOptions}
           </select>
 
-          <label style="margin-left:4px">${t("opt_size")}</label>
-          <input type="number" class="ps-num-input" style="width:58px" value="${this.fontSize}" min="6" max="300" oninput="Tools.setTextSize(this.value)">
+          <label style="margin-left:2px">${t("opt_size")}</label>
+          <input type="number" class="ps-num-input" style="width:54px" value="${this.fontSize}" min="6" max="300" oninput="Tools.setTextSize(this.value)">
           <span class="opt-val">pt</span>
 
           <!-- Bold Toggle -->
@@ -379,23 +401,78 @@ const Tools = {
             </button>
           </div>
 
-          <!-- Color Chip -->
-          <div style="display:inline-flex; align-items:center; gap:5px; margin-left:4px; cursor:pointer;" title="Change Text Color" onclick="document.getElementById('native-color-input')?.click()">
-            <div id="opt-text-color-chip" style="width:20px; height:20px; border-radius:4px; background:${activeColor}; border:1px solid rgba(255,255,255,0.4); box-shadow:0 1px 3px rgba(0,0,0,0.5);"></div>
+          <div class="opt-separator" style="margin:0 4px;"></div>
+
+          <!-- Text Color Anchor & Popover -->
+          <div class="opt-popover-anchor" id="text-color-anchor">
+            <button class="opt-pill-btn ${this.activeColorPopover === 'color' ? 'active' : ''}" 
+                    title="Change Text Color" 
+                    onclick="event.stopPropagation(); Tools.toggleColorPopover('color')">
+              <span class="opt-chip-swatch" style="background:${activeColor};"></span>
+              <span>${t("opt_text_color")}</span>
+              <span style="font-family:var(--ps-font-mono); font-size:10px; opacity:0.8;">${activeColor.toUpperCase()}</span>
+              <svg viewBox="0 0 10 6" style="width:7px; height:5px; fill:currentColor;"><path d="M0 0l5 5 5-5z"/></svg>
+            </button>
+
+            ${this.activeColorPopover === "color" ? `
+              <div class="opt-color-popover" id="text-color-popover" onclick="event.stopPropagation()">
+                <div class="opt-popover-title">${t("opt_text_color")}</div>
+                <div class="opt-swatch-grid">
+                  ${textColors.map(c => `
+                    <button class="opt-swatch-cell" style="background:${c};" title="${c}" onclick="Tools.setTextColor('${c}')"></button>
+                  `).join("")}
+                </div>
+                <div class="opt-custom-hex-row">
+                  <input type="text" class="opt-custom-hex-input" id="custom-text-color-input" value="${activeColor}" placeholder="#000000" onkeydown="if(event.key==='Enter') Tools.setTextColor(this.value)">
+                  <button class="opt-custom-apply-btn" onclick="Tools.setTextColor(document.getElementById('custom-text-color-input').value)">OK</button>
+                </div>
+              </div>
+            ` : ""}
+          </div>
+
+          <!-- Text Background Anchor & Popover -->
+          <div class="opt-popover-anchor" id="text-bg-anchor">
+            <button class="opt-pill-btn ${this.activeColorPopover === 'bg' ? 'active' : ''}" 
+                    title="Change Text Background" 
+                    onclick="event.stopPropagation(); Tools.toggleColorPopover('bg')">
+              <span class="opt-chip-swatch ${this.textBgColor === 'transparent' ? 'transparent' : ''}" style="${this.textBgColor !== 'transparent' ? `background:${this.textBgColor};` : ''}"></span>
+              <span>${t("opt_text_bg")}</span>
+              <span style="font-family:var(--ps-font-mono); font-size:10px; opacity:0.8;">${this.textBgColor === 'transparent' ? t('opt_none') : this.textBgColor}</span>
+              <svg viewBox="0 0 10 6" style="width:7px; height:5px; fill:currentColor;"><path d="M0 0l5 5 5-5z"/></svg>
+            </button>
+
+            ${this.activeColorPopover === "bg" ? `
+              <div class="opt-color-popover" id="text-bg-popover" onclick="event.stopPropagation()">
+                <div class="opt-popover-title">${t("opt_text_bg")}</div>
+                <button class="opt-popover-none-btn" onclick="Tools.setTextBgColor('transparent')">
+                  <span class="opt-chip-swatch transparent"></span>
+                  <span>${t("opt_none")}</span>
+                </button>
+                <div class="opt-swatch-grid">
+                  ${textBgPresets.map(p => `
+                    <button class="opt-swatch-cell" style="background:${p.val};" title="${p.label}" onclick="Tools.setTextBgColor('${p.val}')"></button>
+                  `).join("")}
+                </div>
+                <div class="opt-custom-hex-row">
+                  <input type="text" class="opt-custom-hex-input" id="custom-text-bg-input" value="${this.textBgColor === 'transparent' ? '' : this.textBgColor}" placeholder="#hex or rgba()" onkeydown="if(event.key==='Enter') Tools.setTextBgColor(this.value)">
+                  <button class="opt-custom-apply-btn" onclick="Tools.setTextBgColor(document.getElementById('custom-text-bg-input').value)">OK</button>
+                </div>
+              </div>
+            ` : ""}
           </div>
 
           <!-- Live Commit / Cancel Actions -->
           ${this.textEditing ? `
-            <div style="display:inline-flex; align-items:center; gap:6px; margin-left:10px;">
-              <button class="ps-btn primary" style="height:24px; padding:0 10px; font-size:11px; font-weight:600; background:#10b981; border-color:#059669;" title="Commit Text (Enter / ⌘Enter)" onclick="Tools.commitTextEdit()">
-                ✓ Commit
+            <div style="display:inline-flex; align-items:center; gap:6px; margin-left:8px;">
+              <button class="ps-btn primary" style="height:24px; padding:0 12px; font-size:11px; font-weight:700; background:#10b981; border-color:#059669; box-shadow:0 1px 4px rgba(16,185,129,0.4);" title="Commit Text (Enter / ⌘Enter)" onclick="Tools.commitTextEdit()">
+                ✓ ${t("opt_commit")}
               </button>
-              <button class="ps-btn secondary" style="height:24px; padding:0 8px; font-size:11px;" title="Cancel Text (Esc)" onclick="Tools.cancelTextEdit()">
-                ✕ Cancel
+              <button class="ps-btn secondary" style="height:24px; padding:0 10px; font-size:11px; font-weight:600;" title="Cancel Text (Esc)" onclick="Tools.cancelTextEdit()">
+                ✕ ${t("opt_cancel")}
               </button>
             </div>
           ` : `
-            <span style="font-size:11px; color:var(--ps-text-dim); margin-left:8px;">
+            <span style="font-size:11px; color:var(--ps-text-dim); margin-left:6px;">
               Click canvas to write
             </span>
           `}
@@ -1411,8 +1488,8 @@ const Tools = {
         this.cancelTextEdit();
         return;
       }
-      // Cmd+Enter or Ctrl+Enter commits edit
-      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+      // Cmd+Enter, Ctrl+Enter or NumpadEnter commits edit
+      if ((e.key === "Enter" && (e.metaKey || e.ctrlKey)) || e.code === "NumpadEnter") {
         e.preventDefault();
         e.stopPropagation();
         this.commitTextEdit();
@@ -1424,6 +1501,31 @@ const Tools = {
     editor.addEventListener("mousedown", (e) => {
       e.stopPropagation();
     });
+
+    // Close open color popovers when clicking outside
+    document.addEventListener("click", (e) => {
+      if (this.activeColorPopover) {
+        if (!e.target.closest("#text-color-anchor") && !e.target.closest("#text-bg-anchor")) {
+          this.closeColorPopovers();
+        }
+      }
+    });
+  },
+
+  toggleColorPopover(type) {
+    if (this.activeColorPopover === type) {
+      this.activeColorPopover = null;
+    } else {
+      this.activeColorPopover = type;
+    }
+    this.updateOptionsBar("text");
+  },
+
+  closeColorPopovers() {
+    if (this.activeColorPopover) {
+      this.activeColorPopover = null;
+      this.updateOptionsBar("text");
+    }
   },
 
   startInlineTextEdit(x, y) {
@@ -1440,7 +1542,7 @@ const Tools = {
     this.textEditing = true;
 
     if (!this.fontColor) {
-      this.fontColor = window.ColorPicker ? ColorPicker.getFgColor() : "#ffffff";
+      this.fontColor = "#000000";
     }
 
     editor.style.left = `${this.textX}px`;
@@ -1473,7 +1575,26 @@ const Tools = {
     editor.style.fontWeight = this.fontWeight;
     editor.style.fontStyle = this.fontStyle;
     editor.style.textAlign = this.textAlign;
-    editor.style.color = this.fontColor || (window.ColorPicker ? ColorPicker.getFgColor() : "#ffffff");
+    editor.style.color = this.fontColor || "#000000";
+    editor.style.caretColor = this.fontColor || "#000000";
+
+    if (this.textAlign === "center") {
+      editor.style.transform = "translateX(-50%)";
+    } else if (this.textAlign === "right") {
+      editor.style.transform = "translateX(-100%)";
+    } else {
+      editor.style.transform = "none";
+    }
+
+    if (this.textBgColor && this.textBgColor !== "transparent") {
+      editor.style.backgroundColor = this.textBgColor;
+      editor.style.borderRadius = "4px";
+      editor.style.padding = "4px 8px";
+    } else {
+      editor.style.backgroundColor = "transparent";
+      editor.style.borderRadius = "4px";
+      editor.style.padding = "4px 8px";
+    }
   },
 
   setTextFont(family) {
@@ -1505,35 +1626,50 @@ const Tools = {
   },
 
   setTextColor(hex) {
-    this.fontColor = hex.startsWith("#") ? hex : "#" + hex;
-    if (window.ColorPicker) {
+    if (!hex) return;
+    const clean = hex.trim();
+    this.fontColor = clean.startsWith("#") || clean.startsWith("rgb") ? clean : "#" + clean;
+    if (window.ColorPicker && ColorPicker.setFgColor) {
       ColorPicker.setFgColor(this.fontColor);
     }
     this.applyTextStylesToEditor();
-    const chip = document.getElementById("opt-text-color-chip");
-    if (chip) chip.style.background = this.fontColor;
+    this.activeColorPopover = null;
+    this.updateOptionsBar("text");
+  },
+
+  setTextBgColor(color) {
+    if (!color) return;
+    const clean = color.trim();
+    if (clean === "transparent" || clean === "none") {
+      this.textBgColor = "transparent";
+    } else {
+      this.textBgColor = clean.startsWith("#") || clean.startsWith("rgb") ? clean : "#" + clean;
+    }
+    this.applyTextStylesToEditor();
+    this.activeColorPopover = null;
+    this.updateOptionsBar("text");
   },
 
   commitTextEdit() {
     const editor = document.getElementById("canvas-text-editor");
     if (!editor || !this.textEditing) return;
 
-    const rawText = editor.innerText.trim();
+    const rawText = (editor.innerText || editor.textContent || "").trim();
     if (!rawText) {
       this.cancelTextEdit();
       return;
     }
 
-    const active = Layers.getActiveLayer();
-    if (!active || active.locked) {
-      this.cancelTextEdit();
-      return;
+    const snippet = rawText.replace(/\s+/g, ' ').substring(0, 16);
+    let targetLayer = Layers.getActiveLayer();
+    // Auto-create dedicated layer for text if on locked/background layer
+    if (!targetLayer || targetLayer.locked || targetLayer.isBackground) {
+      targetLayer = Layers.createLayer(`Text: ${snippet}`, false);
     }
 
-    const lines = editor.innerText.split("\n");
-    const ctx = active.ctx;
+    const lines = (editor.innerText || editor.textContent || "").split("\n");
+    const ctx = targetLayer.ctx;
     ctx.save();
-    ctx.fillStyle = this.fontColor || (window.ColorPicker ? ColorPicker.getFgColor() : "#ffffff");
 
     const stylePrefix = this.fontStyle === "italic" ? "italic " : "";
     const weightPrefix = this.fontWeight === "bold" ? "bold " : "";
@@ -1542,28 +1678,58 @@ const Tools = {
     ctx.textBaseline = "top";
 
     const lineHeight = this.fontSize * 1.25;
-    const editorW = editor.offsetWidth;
 
-    let baseLineX = this.textX;
-    if (this.textAlign === "center") {
-      baseLineX = this.textX + (editorW / 2);
-    } else if (this.textAlign === "right") {
-      baseLineX = this.textX + editorW;
+    // Calculate maximum line width
+    let maxLineWidth = 0;
+    lines.forEach((line) => {
+      const metrics = ctx.measureText(line);
+      if (metrics.width > maxLineWidth) {
+        maxLineWidth = metrics.width;
+      }
+    });
+
+    const totalTextH = lines.length * lineHeight;
+    const padX = 8;
+    const padY = 4;
+
+    // Render background if not transparent
+    if (this.textBgColor && this.textBgColor !== "transparent") {
+      let bgX = this.textX - padX;
+      if (this.textAlign === "center") {
+        bgX = this.textX - (maxLineWidth / 2) - padX;
+      } else if (this.textAlign === "right") {
+        bgX = this.textX - maxLineWidth - padX;
+      }
+      const bgY = this.textY - padY;
+      const bgW = maxLineWidth + (padX * 2);
+      const bgH = totalTextH + (padY * 2);
+
+      ctx.fillStyle = this.textBgColor;
+      ctx.beginPath();
+      if (typeof ctx.roundRect === "function") {
+        ctx.roundRect(bgX, bgY, bgW, bgH, 4);
+      } else {
+        ctx.rect(bgX, bgY, bgW, bgH);
+      }
+      ctx.fill();
     }
 
+    // Render text lines
+    ctx.fillStyle = this.fontColor || "#000000";
     lines.forEach((line, idx) => {
-      ctx.fillText(line, baseLineX, this.textY + (idx * lineHeight));
+      ctx.fillText(line, this.textX, this.textY + (idx * lineHeight));
     });
 
     ctx.restore();
 
-    // Reset and hide
+    // Reset and hide inline editor
     editor.innerText = "";
     editor.classList.add("hidden");
     this.textEditing = false;
+    this.activeColorPopover = null;
 
     Layers.renderLayersPanel();
-    History.pushState("action_type", null, "text", `"${rawText.substring(0, 15)}"`);
+    History.pushState("action_type", null, "text", `"${snippet}"`);
     this.updateOptionsBar("text");
   },
 
@@ -1574,6 +1740,7 @@ const Tools = {
       editor.classList.add("hidden");
     }
     this.textEditing = false;
+    this.activeColorPopover = null;
     this.updateOptionsBar("text");
   },
 
