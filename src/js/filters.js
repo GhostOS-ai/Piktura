@@ -212,7 +212,7 @@ const Filters = {
       "curves": "Curves",
       "hue-saturation": "Hue / Saturation"
     };
-    History.pushState(nameMap[this.currentAdjustment] || "Adjustment");
+    History.pushState(nameMap[this.currentAdjustment] || "Adjustment", null, "filter");
     this.backupCanvas = null;
     this.currentAdjustment = null;
   },
@@ -266,7 +266,7 @@ const Filters = {
     }
     active.ctx.putImageData(imgData, 0, 0);
     Layers.renderLayersPanel();
-    History.pushState("Invert");
+    History.pushState("Invert", null, "filter");
   },
 
   desaturate() {
@@ -283,7 +283,7 @@ const Filters = {
     }
     active.ctx.putImageData(imgData, 0, 0);
     Layers.renderLayersPanel();
-    History.pushState("Desaturate");
+    History.pushState("Desaturate", null, "filter");
   },
 
   autoTone() {
@@ -318,7 +318,7 @@ const Filters = {
     }
     active.ctx.putImageData(imgData, 0, 0);
     Layers.renderLayersPanel();
-    History.pushState("Auto Tone");
+    History.pushState("Auto Tone", null, "filter");
   },
 
   gaussianBlur(radius = 8) {
@@ -334,7 +334,7 @@ const Filters = {
     active.ctx.clearRect(0, 0, active.width, active.height);
     active.ctx.drawImage(temp, 0, 0);
     Layers.renderLayersPanel();
-    History.pushState(`Gaussian Blur (${radius}px)`);
+    History.pushState("Gaussian Blur", null, "filter", `(${radius}px)`);
   },
 
   sharpen() {
@@ -347,7 +347,7 @@ const Filters = {
     ];
     this.applyConvolution(active.ctx, weights);
     Layers.renderLayersPanel();
-    History.pushState("Sharpen");
+    History.pushState("Sharpen", null, "filter");
   },
 
   motionBlur(dist = 14, angle = 0) {
@@ -370,7 +370,7 @@ const Filters = {
     active.ctx.clearRect(0, 0, active.width, active.height);
     active.ctx.drawImage(temp, 0, 0);
     Layers.renderLayersPanel();
-    History.pushState(`Motion Blur (${dist}px)`);
+    History.pushState("Motion Blur", null, "filter", `(${dist}px)`);
   },
 
   unsharpMask() {
@@ -387,7 +387,7 @@ const Filters = {
     ];
     this.applyConvolution(active.ctx, weights);
     Layers.renderLayersPanel();
-    History.pushState("Find Edges");
+    History.pushState("Find Edges", null, "filter");
   },
 
   addNoise(amount = 20) {
@@ -405,7 +405,7 @@ const Filters = {
     }
     active.ctx.putImageData(imgData, 0, 0);
     Layers.renderLayersPanel();
-    History.pushState("Add Noise");
+    History.pushState("Add Noise", null, "filter");
   },
 
   pixelateMosaic(blockSize = 12) {
@@ -437,7 +437,7 @@ const Filters = {
     }
     active.ctx.putImageData(imgData, 0, 0);
     Layers.renderLayersPanel();
-    History.pushState("Pixelate");
+    History.pushState("Pixelate", null, "filter");
   },
 
   applyConvolution(ctx, weights) {
@@ -486,10 +486,17 @@ const Selection = {
     Tools.renderSelectionOverlay();
   },
 
-  deselect() {
+  deselect(pushHistory = false) {
+    const hadSelection = !!(this.activeBox || (window.Tools && Tools.selectionBox));
     this.activeBox = null;
-    Tools.selectionBox = null;
-    Tools.clearOverlay();
+    if (window.Tools) {
+      Tools.selectionBox = null;
+      Tools.lassoPoints = [];
+      Tools.clearOverlay();
+    }
+    if (hadSelection && pushHistory && window.History) {
+      History.pushState("action_deselect", null, "select");
+    }
   },
 
   inverse() {

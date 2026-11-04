@@ -14,8 +14,8 @@
   <!-- ==================== TOP SYSTEM & APPLICATION MENU BAR ==================== -->
   <header class="ps-menubar pywebview-drag-region">
     <div class="menubar-left no-drag">
-      <div class="ps-app-badge" title="Piktura Studio v1.0">
-        <span class="ps-brand-icon">🎨</span>
+      <div class="ps-app-badge" title="Piktura Studio v1.1.2" onclick="App.showAboutModal()">
+        <img src="assets/icon.png" class="ps-brand-icon-img" alt="Piktura">
         <span class="ps-brand-name">Piktura</span>
       </div>
 
@@ -665,8 +665,43 @@
     </div>
   </div>
 
+  <!-- ==================== ABOUT & BRAND DASHBOARD MODAL ==================== -->
+  <div id="modal-about" class="ps-modal hidden">
+    <div class="modal-backdrop" onclick="App.closeAboutModal()"></div>
+    <div class="modal-window about-modal-window" style="width: 440px;">
+      <div class="modal-header">
+        <h3 data-i18n="menu_about">About Piktura Studio...</h3>
+        <button class="modal-close-btn" onclick="App.closeAboutModal()">✕</button>
+      </div>
+      <div class="modal-body" style="text-align: center; padding: 26px 20px 20px;">
+        <img src="assets/icon.png" class="about-logo-big" alt="Piktura Studio">
+        <h2 class="about-app-title">Piktura Studio</h2>
+        <div class="about-version-badge">v1.1.2 • Apple Silicon Native</div>
+        <p class="about-tagline-text" data-i18n="about_tagline">Next-Gen Professional Creative Suite</p>
+        <div class="about-pills">
+          <span class="about-pill">⚡ Metal GPU</span>
+          <span class="about-pill">🔒 100% Offline</span>
+          <span class="about-pill">💎 No Subscription</span>
+        </div>
+        <p class="about-description-text" data-i18n="about_description">Photoshop-grade ergonomics, lightning-fast launch, 100% offline and subscription-free creative freedom.</p>
+        <div class="about-footer-line">
+          <span>Created by <strong>KIB.best</strong> • 2026</span>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content: center;">
+        <button class="ps-btn primary" onclick="App.closeAboutModal()" style="min-width: 100px;">OK</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Photoshop Dynamic Circle Brush Ring Cursor -->
   <div id="brush-cursor" class="brush-cursor"></div>
+
+  <!-- Dynamic Eyedropper Loupe Preview -->
+  <div id="eyedropper-loupe" class="eyedropper-loupe">
+    <div class="loupe-color" id="loupe-color-preview"></div>
+    <span class="loupe-hex" id="loupe-hex-text">#FFFFFF</span>
+  </div>
 
   <!-- Hidden native file input for Opening Files -->
   <input type="file" id="native-file-input" style="display:none;" accept="image/*,.psd" onchange="App.handleFileInput(event)">

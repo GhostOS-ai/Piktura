@@ -365,6 +365,40 @@ const Canvas = {
     History.pushState(`Flip Vertical`);
   },
 
+  cropTo(box) {
+    if (!box || box.w < 10 || box.h < 10) return;
+    const newW = Math.round(box.w);
+    const newH = Math.round(box.h);
+    const offsetX = Math.round(box.x);
+    const offsetY = Math.round(box.y);
+
+    Layers.docWidth = newW;
+    Layers.docHeight = newH;
+
+    Layers.layers.forEach(l => {
+      const temp = document.createElement("canvas");
+      temp.width = l.canvas.width;
+      temp.height = l.canvas.height;
+      temp.getContext("2d").drawImage(l.canvas, 0, 0);
+
+      l.width = newW;
+      l.height = newH;
+      l.canvas.width = newW;
+      l.canvas.height = newH;
+      l.ctx.clearRect(0, 0, newW, newH);
+      l.ctx.drawImage(temp, -offsetX, -offsetY);
+    });
+
+    if (window.Selection) {
+      Selection.deselect(false);
+    }
+
+    this.fitToScreen();
+    this.drawRulers();
+    Layers.renderLayersPanel();
+    History.pushState("action_crop", null, "crop");
+  },
+
   redraw() {
     this.updateViewportTransform();
     this.drawRulers();

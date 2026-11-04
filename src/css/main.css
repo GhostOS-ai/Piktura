@@ -77,7 +77,23 @@ html, body {
   color: #ffffff;
   padding-right: 8px;
   border-right: 1px solid var(--ps-border-subtle);
-  cursor: default;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.ps-app-badge:hover {
+  opacity: 0.88;
+}
+
+.ps-brand-icon-img {
+  width: 19px;
+  height: 19px;
+  border-radius: 4.5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  display: inline-block;
+  vertical-align: middle;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 
 .ps-brand-icon {
@@ -526,4 +542,104 @@ html, body {
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0,0,0,0.5);
   border: 1px solid #fff;
+}
+
+/* About Modal & Branding Dashboard */
+.about-logo-big {
+  width: 84px;
+  height: 84px;
+  border-radius: 19px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  margin: 0 auto 14px;
+  display: block;
+}
+
+.about-app-title {
+  margin: 0 0 4px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+}
+
+.about-version-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ps-accent-bright);
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  padding: 2px 9px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.about-tagline-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ps-text-main);
+  margin: 0 0 14px;
+}
+
+.about-pills {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.about-pill {
+  font-size: 11px;
+  color: var(--ps-text-main);
+  background: var(--ps-bg-darkest);
+  border: 1px solid var(--ps-border-subtle);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.about-description-text {
+  font-size: 12px;
+  color: var(--ps-text-dim);
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+
+.about-footer-line {
+  font-size: 11px;
+  color: var(--ps-text-dim);
+  border-top: 1px solid var(--ps-border-subtle);
+  padding-top: 12px;
+}
+
+/* Eyedropper Floating Loupe Ring */
+.eyedropper-loupe {
+  position: fixed;
+  pointer-events: none;
+  z-index: 99999;
+  display: none;
+  transform: translate(14px, 14px);
+  background: rgba(22, 24, 30, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 5px 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+  align-items: center;
+  gap: 6px;
+}
+
+.loupe-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.4);
+}
+
+.loupe-hex {
+  font-size: 11px;
+  font-family: var(--ps-font-mono, monospace);
+  font-weight: 600;
+  color: #ffffff;
 }

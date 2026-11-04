@@ -77,12 +77,19 @@ class PikturaBridgeAPI:
                 return res[0]
         return None
 
+def get_resource_path(relative_str):
+    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+        base = Path(sys._MEIPASS)
+    else:
+        base = Path(__file__).parent
+    return base / relative_str
+
 def set_macos_dock_icon():
     if sys.platform == "darwin":
         try:
             from AppKit import NSApplication, NSImage
             app = NSApplication.sharedApplication()
-            icon_file = Path(__file__).parent / "assets" / "icon.png"
+            icon_file = get_resource_path("assets/icon.png")
             if icon_file.exists():
                 img = NSImage.alloc().initWithContentsOfFile_(str(icon_file))
                 if img:
@@ -92,8 +99,7 @@ def set_macos_dock_icon():
 
 def launch():
     set_macos_dock_icon()
-    base_dir = Path(__file__).parent
-    index_html = base_dir / "src" / "index.html"
+    index_html = get_resource_path("src/index.html")
 
     if not index_html.exists():
         raise FileNotFoundError(f"Missing UI assets at: {index_html}")

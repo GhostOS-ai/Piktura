@@ -127,7 +127,7 @@ const Layers = {
 
     this.mountToDOM();
     this.renderLayersPanel();
-    History.pushState(`New Layer`);
+    History.pushState("action_new_layer", null, "layer");
     return layer;
   },
 
@@ -139,7 +139,7 @@ const Layers = {
     this.activeLayerIndex++;
     this.mountToDOM();
     this.renderLayersPanel();
-    History.pushState(`Duplicate ${active.name}`);
+    History.pushState("action_duplicate_layer", null, "layer", active.name);
   },
 
   deleteActiveLayer() {
@@ -152,14 +152,14 @@ const Layers = {
     this.activeLayerIndex = Math.max(0, this.activeLayerIndex - 1);
     this.mountToDOM();
     this.renderLayersPanel();
-    History.pushState(`Delete ${deletedName}`);
+    History.pushState("action_delete_layer", null, "layer", deletedName);
   },
 
   setActiveOpacity(percent) {
     const active = this.getActiveLayer();
     if (active) {
       active.setOpacity(percent / 100);
-      History.pushState(`Opacity Change`);
+      History.pushState("Opacity Change", null, "layer", `${percent}%`);
     }
   },
 
@@ -167,7 +167,7 @@ const Layers = {
     const active = this.getActiveLayer();
     if (active) {
       active.setBlendMode(mode);
-      History.pushState(`Blend Mode Change`);
+      History.pushState("Blend Mode Change", null, "layer", mode);
     }
   },
 
@@ -186,7 +186,7 @@ const Layers = {
     this.activeLayerIndex--;
     this.mountToDOM();
     this.renderLayersPanel();
-    History.pushState(`Merge Down`);
+    History.pushState("action_merge_down", null, "layer");
   },
 
   mergeVisible() {
@@ -207,7 +207,7 @@ const Layers = {
     this.activeLayerIndex = 0;
     this.mountToDOM();
     this.renderLayersPanel();
-    History.pushState(`Merge Visible`);
+    History.pushState("action_flatten_image", null, "layer");
   },
 
   flattenImage() {
@@ -225,7 +225,7 @@ const Layers = {
     this.activeLayerIndex = 0;
     this.mountToDOM();
     this.renderLayersPanel();
-    History.pushState(`Flatten Image`);
+    History.pushState("action_flatten_image", null, "layer");
   },
 
   updateLayerControls() {

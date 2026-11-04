@@ -2,13 +2,13 @@
  * Piktura Studio — Core Application Coordinator & Menus
  */
 const App = {
-  version: "1.1.0",
+  version: "1.1.2",
 
   init() {
     I18n.init();
     ColorPicker.init();
     Layers.init(1920, 1080, "white");
-    History.pushState(I18n.t("new_document") || "New Document");
+    History.pushState("new_document", null, "document");
     Canvas.init();
     Tools.init();
     this.setupGlobalKeyboardShortcuts();
@@ -26,6 +26,32 @@ const App = {
       const cmd = e.metaKey || e.ctrlKey;
       const shift = e.shiftKey;
       const alt = e.altKey;
+
+      // ESCAPE Key: Dismiss modals, cancel crop, deselect
+      if (e.code === "Escape" || e.key === "Escape") {
+        e.preventDefault();
+        this.closeAllModals();
+        if (window.Tools && Tools.isCropping) {
+          Tools.cancelCrop();
+          return;
+        }
+        if (window.Tools && Tools.penPoints && Tools.penPoints.length > 0) {
+          Tools.cancelPen();
+          return;
+        }
+        if (window.Selection && (Selection.activeBox || (window.Tools && Tools.selectionBox))) {
+          Selection.deselect(true);
+          return;
+        }
+        return;
+      }
+
+      // ENTER Key: Commit crop if active
+      if ((e.code === "Enter" || e.key === "Enter") && window.Tools && Tools.isCropping) {
+        e.preventDefault();
+        Tools.applyCrop();
+        return;
+      }
 
       // Photoshop Keybindings with Cmd / Ctrl
       if (cmd && !shift && !alt && e.code === "KeyZ") {
@@ -317,8 +343,18 @@ const App = {
     }
   },
 
+  closeAllModals() {
+    document.querySelectorAll(".ps-modal").forEach(m => m.classList.add("hidden"));
+  },
+
   showAboutModal() {
-    alert("🎨 Piktura Studio v1.1.0\nProfessional GPU-Accelerated Creative Suite for macOS & Creators.\n\nDesigned by KIB.best • 100% Offline & Private");
+    const modal = document.getElementById("modal-about");
+    if (modal) modal.classList.remove("hidden");
+  },
+
+  closeAboutModal() {
+    const modal = document.getElementById("modal-about");
+    if (modal) modal.classList.add("hidden");
   },
 
   showSettingsModal() {
