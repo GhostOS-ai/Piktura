@@ -61,9 +61,15 @@ const Tools = {
   penStrokeWidth: 2,
 
   // Type Tool State
-  fontFamily: "Helvetica Neue",
+  fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif",
   fontSize: 48,
-  fontStyle: "normal",    // "normal" | "bold" | "italic"
+  fontWeight: "normal",   // "normal" | "bold"
+  fontStyle: "normal",    // "normal" | "italic"
+  textAlign: "left",      // "left" | "center" | "right"
+  fontColor: null,        // hex string or null (defaults to fgColor)
+  textEditing: false,
+  textX: 0,
+  textY: 0,
 
   // Eyedropper State
   eyedropperSampleSize: 1,
@@ -71,6 +77,7 @@ const Tools = {
   init() {
     this.select("brush");
     this.setupDrawingCanvas();
+    this.setupTextEditorEvents();
     this.startMarchingAntsLoop();
   },
 
@@ -78,6 +85,11 @@ const Tools = {
     // If we were cropping and switched away, cancel crop
     if (this.isCropping && toolName !== "crop") {
       this.cancelCrop();
+    }
+
+    // If we were editing text and switched away, commit text
+    if (this.textEditing && toolName !== "text") {
+      this.commitTextEdit();
     }
 
     this.currentTool = toolName;
@@ -288,25 +300,105 @@ const Tools = {
         </div>
       `;
     } else if (tool === "text") {
+      const fg = window.ColorPicker ? ColorPicker.getFgColor() : "#ffffff";
+      const isBold = this.fontWeight === "bold";
+      const isItalic = this.fontStyle === "italic";
+      const align = this.textAlign || "left";
+      const activeColor = this.fontColor || fg;
+
+      const fonts = [
+        // Sans-Serif
+        { name: "SF Pro / System", val: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif" },
+        { name: "Helvetica Neue", val: "'Helvetica Neue', Helvetica, Arial, sans-serif" },
+        { name: "Arial", val: "Arial, sans-serif" },
+        { name: "Inter", val: "Inter, -apple-system, sans-serif" },
+        { name: "Trebuchet MS", val: "'Trebuchet MS', sans-serif" },
+        { name: "Verdana", val: "Verdana, sans-serif" },
+        { name: "Futura", val: "Futura, 'Trebuchet MS', sans-serif" },
+        { name: "Avenir Next", val: "'Avenir Next', Avenir, sans-serif" },
+        { name: "Impact", val: "Impact, Charcoal, sans-serif" },
+        { name: "Gill Sans", val: "'Gill Sans', 'Gill Sans MT', sans-serif" },
+        { name: "Optima", val: "Optima, sans-serif" },
+        // Serif
+        { name: "Georgia", val: "Georgia, serif" },
+        { name: "Times New Roman", val: "'Times New Roman', Times, serif" },
+        { name: "Palatino", val: "Palatino, 'Palatino Linotype', serif" },
+        { name: "Garamond", val: "Garamond, 'Baskerville Old Face', serif" },
+        { name: "Baskerville", val: "Baskerville, serif" },
+        { name: "Didot", val: "Didot, 'Bodoni MT', serif" },
+        { name: "Playfair Display", val: "'Playfair Display', Georgia, serif" },
+        { name: "Charter", val: "Charter, serif" },
+        // Monospace
+        { name: "Menlo", val: "Menlo, Monaco, monospace" },
+        { name: "Monaco", val: "Monaco, Consolas, monospace" },
+        { name: "Courier New", val: "'Courier New', Courier, monospace" },
+        // Script & Decorative
+        { name: "Comic Sans MS", val: "'Comic Sans MS', cursive" },
+        { name: "Copperplate", val: "Copperplate, 'Copperplate Gothic Bold', fantasy" },
+        { name: "Papyrus", val: "Papyrus, fantasy" },
+        { name: "Brush Script MT", val: "'Brush Script MT', cursive" },
+        { name: "Snell Roundhand", val: "'Snell Roundhand', cursive" }
+      ];
+
+      const fontOptions = fonts.map(f => {
+        const isSel = this.fontFamily === f.val ? "selected" : "";
+        return `<option value="${f.val}" ${isSel} style="font-family:${f.val}">${f.name}</option>`;
+      }).join("");
+
       container.innerHTML = `
-        <div class="opt-group">
+        <div class="opt-group" style="display:flex; align-items:center; gap:8px;">
           <label>${t("opt_font")}</label>
-          <select class="ps-select" onchange="Tools.fontFamily = this.value">
-            <option value="Helvetica Neue">Helvetica Neue</option>
-            <option value="-apple-system, BlinkMacSystemFont, sans-serif">Apple SF Pro</option>
-            <option value="Arial">Arial</option>
-            <option value="Georgia">Georgia</option>
-            <option value="Times New Roman">Times New Roman</option>
-            <option value="Courier New">Courier New</option>
+          <select class="ps-select" style="min-width:145px; font-weight:500;" onchange="Tools.setTextFont(this.value)">
+            ${fontOptions}
           </select>
-          <label style="margin-left:12px">${t("opt_size")}</label>
-          <input type="number" class="ps-num-input" style="width:55px" value="${this.fontSize}" min="8" max="250" onchange="Tools.fontSize = parseInt(this.value, 10)"> pt
-          <label style="margin-left:12px">${t("opt_style")}</label>
-          <select class="ps-select" onchange="Tools.fontStyle = this.value">
-            <option value="normal">Regular</option>
-            <option value="bold">Bold</option>
-            <option value="italic">Italic</option>
-          </select>
+
+          <label style="margin-left:4px">${t("opt_size")}</label>
+          <input type="number" class="ps-num-input" style="width:58px" value="${this.fontSize}" min="6" max="300" oninput="Tools.setTextSize(this.value)">
+          <span class="opt-val">pt</span>
+
+          <!-- Bold Toggle -->
+          <button class="ps-btn secondary tool-opt-toggle ${isBold ? 'active-opt' : ''}" style="width:26px; height:24px; padding:0; font-weight:800; font-family:serif;" title="Bold (B)" onclick="Tools.toggleTextBold()">
+            B
+          </button>
+
+          <!-- Italic Toggle -->
+          <button class="ps-btn secondary tool-opt-toggle ${isItalic ? 'active-opt' : ''}" style="width:26px; height:24px; padding:0; font-style:italic; font-family:serif;" title="Italic (I)" onclick="Tools.toggleTextItalic()">
+            I
+          </button>
+
+          <!-- Alignment Buttons -->
+          <div style="display:inline-flex; border:1px solid var(--ps-border-dark); border-radius:4px; overflow:hidden; margin-left:2px;">
+            <button class="ps-btn secondary ${align === 'left' ? 'active-opt' : ''}" style="height:24px; width:26px; padding:0; border-radius:0; border:none;" title="Align Left" onclick="Tools.setTextAlign('left')">
+              <svg viewBox="0 0 16 16" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;"><line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="8" x2="10" y2="8"/><line x1="2" y1="12" x2="13" y2="12"/></svg>
+            </button>
+            <button class="ps-btn secondary ${align === 'center' ? 'active-opt' : ''}" style="height:24px; width:26px; padding:0; border-radius:0; border:none; border-left:1px solid var(--ps-border-dark); border-right:1px solid var(--ps-border-dark);" title="Align Center" onclick="Tools.setTextAlign('center')">
+              <svg viewBox="0 0 16 16" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;"><line x1="2" y1="4" x2="14" y2="4"/><line x1="4" y1="8" x2="12" y2="8"/><line x1="3" y1="12" x2="13" y2="12"/></svg>
+            </button>
+            <button class="ps-btn secondary ${align === 'right' ? 'active-opt' : ''}" style="height:24px; width:26px; padding:0; border-radius:0; border:none;" title="Align Right" onclick="Tools.setTextAlign('right')">
+              <svg viewBox="0 0 16 16" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;"><line x1="2" y1="4" x2="14" y2="4"/><line x1="6" y1="8" x2="14" y2="8"/><line x1="3" y1="12" x2="14" y2="12"/></svg>
+            </button>
+          </div>
+
+          <!-- Color Chip -->
+          <div style="display:inline-flex; align-items:center; gap:5px; margin-left:4px; cursor:pointer;" title="Change Text Color" onclick="document.getElementById('native-color-input')?.click()">
+            <div id="opt-text-color-chip" style="width:20px; height:20px; border-radius:4px; background:${activeColor}; border:1px solid rgba(255,255,255,0.4); box-shadow:0 1px 3px rgba(0,0,0,0.5);"></div>
+          </div>
+
+          <!-- Live Commit / Cancel Actions -->
+          ${this.textEditing ? `
+            <div style="display:inline-flex; align-items:center; gap:6px; margin-left:10px;">
+              <button class="ps-btn primary" style="height:24px; padding:0 10px; font-size:11px; font-weight:600; background:#10b981; border-color:#059669;" title="Commit Text (Enter / ⌘Enter)" onclick="Tools.commitTextEdit()">
+                ✓ Commit
+              </button>
+              <button class="ps-btn secondary" style="height:24px; padding:0 8px; font-size:11px;" title="Cancel Text (Esc)" onclick="Tools.cancelTextEdit()">
+                ✕ Cancel
+              </button>
+            </div>
+          ` : `
+            <span style="font-size:11px; color:var(--ps-text-dim); margin-left:8px;">
+              Click canvas to write
+            </span>
+          `}
         </div>
       `;
     } else if (tool === "pen") {
@@ -532,9 +624,15 @@ const Tools = {
         return;
       }
 
-      // Handle Text Tool
+      // Handle Text Tool (Photoshop-Grade On-Canvas Insertion)
       if (this.currentTool === "text") {
-        this.promptTextInsertion(coords.x, coords.y);
+        if (e.target.id === "canvas-text-editor" || e.target.closest("#canvas-text-editor")) {
+          return;
+        }
+        if (this.textEditing) {
+          this.commitTextEdit();
+        }
+        this.startInlineTextEdit(coords.x, coords.y);
         return;
       }
 
@@ -1300,23 +1398,183 @@ const Tools = {
     ctx.putImageData(imgData, left, top);
   },
 
-  // Horizontal Type Tool Placement
-  promptTextInsertion(x, y) {
-    const text = prompt("Enter text to insert at cursor:", "Piktura Studio");
-    if (!text) return;
+  // ==================== PHOTOSHOP-GRADE INLINE CANVAS TEXT ENGINE ====================
+  setupTextEditorEvents() {
+    const editor = document.getElementById("canvas-text-editor");
+    if (!editor) return;
+
+    editor.addEventListener("keydown", (e) => {
+      // Escape cancels edit
+      if (e.key === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
+        this.cancelTextEdit();
+        return;
+      }
+      // Cmd+Enter or Ctrl+Enter commits edit
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.commitTextEdit();
+        return;
+      }
+    });
+
+    // Prevent artboard canvas mousedown handlers from interfering while selecting/typing
+    editor.addEventListener("mousedown", (e) => {
+      e.stopPropagation();
+    });
+  },
+
+  startInlineTextEdit(x, y) {
+    const editor = document.getElementById("canvas-text-editor");
+    if (!editor) return;
+
+    // Commit any currently active text edit first
+    if (this.textEditing) {
+      this.commitTextEdit();
+    }
+
+    this.textX = Math.round(x);
+    this.textY = Math.round(y);
+    this.textEditing = true;
+
+    if (!this.fontColor) {
+      this.fontColor = window.ColorPicker ? ColorPicker.getFgColor() : "#ffffff";
+    }
+
+    editor.style.left = `${this.textX}px`;
+    editor.style.top = `${this.textY}px`;
+    this.applyTextStylesToEditor();
+
+    editor.innerText = "Piktura";
+    editor.classList.remove("hidden");
+
+    // Focus and select all content for immediate typing
+    editor.focus();
+    setTimeout(() => {
+      try {
+        const range = document.createRange();
+        range.selectNodeContents(editor);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      } catch (err) {}
+    }, 15);
+
+    this.updateOptionsBar("text");
+  },
+
+  applyTextStylesToEditor() {
+    const editor = document.getElementById("canvas-text-editor");
+    if (!editor) return;
+    editor.style.fontFamily = this.fontFamily;
+    editor.style.fontSize = `${this.fontSize}px`;
+    editor.style.fontWeight = this.fontWeight;
+    editor.style.fontStyle = this.fontStyle;
+    editor.style.textAlign = this.textAlign;
+    editor.style.color = this.fontColor || (window.ColorPicker ? ColorPicker.getFgColor() : "#ffffff");
+  },
+
+  setTextFont(family) {
+    this.fontFamily = family;
+    this.applyTextStylesToEditor();
+  },
+
+  setTextSize(size) {
+    this.fontSize = Math.max(6, Math.min(500, parseInt(size, 10) || 12));
+    this.applyTextStylesToEditor();
+  },
+
+  toggleTextBold() {
+    this.fontWeight = this.fontWeight === "bold" ? "normal" : "bold";
+    this.applyTextStylesToEditor();
+    this.updateOptionsBar("text");
+  },
+
+  toggleTextItalic() {
+    this.fontStyle = this.fontStyle === "italic" ? "normal" : "italic";
+    this.applyTextStylesToEditor();
+    this.updateOptionsBar("text");
+  },
+
+  setTextAlign(align) {
+    this.textAlign = align;
+    this.applyTextStylesToEditor();
+    this.updateOptionsBar("text");
+  },
+
+  setTextColor(hex) {
+    this.fontColor = hex.startsWith("#") ? hex : "#" + hex;
+    if (window.ColorPicker) {
+      ColorPicker.setFgColor(this.fontColor);
+    }
+    this.applyTextStylesToEditor();
+    const chip = document.getElementById("opt-text-color-chip");
+    if (chip) chip.style.background = this.fontColor;
+  },
+
+  commitTextEdit() {
+    const editor = document.getElementById("canvas-text-editor");
+    if (!editor || !this.textEditing) return;
+
+    const rawText = editor.innerText.trim();
+    if (!rawText) {
+      this.cancelTextEdit();
+      return;
+    }
 
     const active = Layers.getActiveLayer();
-    if (!active || active.locked) return;
+    if (!active || active.locked) {
+      this.cancelTextEdit();
+      return;
+    }
 
-    active.ctx.save();
-    active.ctx.fillStyle = ColorPicker.getFgColor();
-    const stylePrefix = this.fontStyle === "italic" ? "italic " : (this.fontStyle === "bold" ? "bold " : "");
-    active.ctx.font = `${stylePrefix}${this.fontSize}px ${this.fontFamily}`;
-    active.ctx.fillText(text, x, y);
-    active.ctx.restore();
+    const lines = editor.innerText.split("\n");
+    const ctx = active.ctx;
+    ctx.save();
+    ctx.fillStyle = this.fontColor || (window.ColorPicker ? ColorPicker.getFgColor() : "#ffffff");
+
+    const stylePrefix = this.fontStyle === "italic" ? "italic " : "";
+    const weightPrefix = this.fontWeight === "bold" ? "bold " : "";
+    ctx.font = `${stylePrefix}${weightPrefix}${this.fontSize}px ${this.fontFamily}`;
+    ctx.textAlign = this.textAlign;
+    ctx.textBaseline = "top";
+
+    const lineHeight = this.fontSize * 1.25;
+    const editorW = editor.offsetWidth;
+
+    let baseLineX = this.textX;
+    if (this.textAlign === "center") {
+      baseLineX = this.textX + (editorW / 2);
+    } else if (this.textAlign === "right") {
+      baseLineX = this.textX + editorW;
+    }
+
+    lines.forEach((line, idx) => {
+      ctx.fillText(line, baseLineX, this.textY + (idx * lineHeight));
+    });
+
+    ctx.restore();
+
+    // Reset and hide
+    editor.innerText = "";
+    editor.classList.add("hidden");
+    this.textEditing = false;
 
     Layers.renderLayersPanel();
-    History.pushState("action_type", null, "text", `"${text.substring(0, 15)}"`);
+    History.pushState("action_type", null, "text", `"${rawText.substring(0, 15)}"`);
+    this.updateOptionsBar("text");
+  },
+
+  cancelTextEdit() {
+    const editor = document.getElementById("canvas-text-editor");
+    if (editor) {
+      editor.innerText = "";
+      editor.classList.add("hidden");
+    }
+    this.textEditing = false;
+    this.updateOptionsBar("text");
   },
 
   // Eyedropper Sampling

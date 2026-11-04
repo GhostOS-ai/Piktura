@@ -39,6 +39,9 @@ const ColorPicker = {
   setFgColor(hex) {
     this.fgColor = hex.startsWith("#") ? hex : "#" + hex;
     this.updateChips();
+    if (window.Tools && Tools.currentTool === "text") {
+      Tools.setTextColor(this.fgColor);
+    }
   },
 
   setBgColor(hex) {

@@ -2,7 +2,7 @@
  * Piktura Studio — Core Application Coordinator & Menus
  */
 const App = {
-  version: "1.1.2",
+  version: "1.1.3",
 
   init() {
     I18n.init();
@@ -18,8 +18,17 @@ const App = {
 
   setupGlobalKeyboardShortcuts() {
     window.addEventListener("keydown", (e) => {
-      // Don't intercept if typing in an input
-      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.tagName === "SELECT") {
+      // Don't intercept if typing in an input or contenteditable element
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.tagName === "SELECT" || e.target.isContentEditable) {
+        if (e.target.id === "canvas-text-editor") {
+          if (e.code === "Escape" || e.key === "Escape") {
+            e.preventDefault();
+            Tools.cancelTextEdit();
+          } else if ((e.metaKey || e.ctrlKey) && (e.code === "Enter" || e.key === "Enter")) {
+            e.preventDefault();
+            Tools.commitTextEdit();
+          }
+        }
         return;
       }
 
@@ -27,10 +36,14 @@ const App = {
       const shift = e.shiftKey;
       const alt = e.altKey;
 
-      // ESCAPE Key: Dismiss modals, cancel crop, deselect
+      // ESCAPE Key: Dismiss modals, cancel text edit, cancel crop, deselect
       if (e.code === "Escape" || e.key === "Escape") {
         e.preventDefault();
         this.closeAllModals();
+        if (window.Tools && Tools.textEditing) {
+          Tools.cancelTextEdit();
+          return;
+        }
         if (window.Tools && Tools.isCropping) {
           Tools.cancelCrop();
           return;
@@ -46,7 +59,12 @@ const App = {
         return;
       }
 
-      // ENTER Key: Commit crop if active
+      // ENTER / CMD+ENTER Key: Commit crop or text if active
+      if (window.Tools && Tools.textEditing && (cmd && (e.code === "Enter" || e.key === "Enter"))) {
+        e.preventDefault();
+        Tools.commitTextEdit();
+        return;
+      }
       if ((e.code === "Enter" || e.key === "Enter") && window.Tools && Tools.isCropping) {
         e.preventDefault();
         Tools.applyCrop();

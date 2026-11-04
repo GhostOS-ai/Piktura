@@ -86,14 +86,17 @@ html, body {
 }
 
 .ps-brand-icon-img {
-  width: 19px;
-  height: 19px;
-  border-radius: 4.5px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  background: #000000;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
   display: inline-block;
   vertical-align: middle;
   object-fit: cover;
   flex-shrink: 0;
+  border: none;
+  outline: none;
 }
 
 .ps-brand-icon {
@@ -397,6 +400,12 @@ html, body {
   background: var(--ps-bg-hover);
 }
 
+.ps-btn.active-opt {
+  background: var(--ps-accent) !important;
+  color: #ffffff !important;
+  border-color: var(--ps-accent-bright) !important;
+}
+
 /* ==================== MODALS ==================== */
 .ps-modal {
   position: fixed;
@@ -546,12 +555,15 @@ html, body {
 
 /* About Modal & Branding Dashboard */
 .about-logo-big {
-  width: 84px;
-  height: 84px;
-  border-radius: 19px;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  width: 88px;
+  height: 88px;
+  border-radius: 20px;
+  background: #000000;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.85);
   margin: 0 auto 14px;
   display: block;
+  border: none;
+  outline: none;
 }
 
 .about-app-title {
