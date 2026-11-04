@@ -1,5 +1,5 @@
 /**
- * Piktura Studio — Tool Engine & Professional Pipeline (v1.1.4)
+ * Piktura Studio — Tool Engine & Professional Pipeline (v1.1.5)
  * Complete Photoshop-Grade Tool Mechanics, Visual Canvas Indicators & Localized History
  */
 const Tools = {
@@ -69,6 +69,7 @@ const Tools = {
   fontColor: "#000000",   // Default black so text is immediately visible on white canvas
   textBgColor: "transparent", // Default transparent (no background)
   textEditing: false,
+  editingLayer: null,     // Currently editing Layer object (for in-place re-editing)
   textX: 0,
   textY: 0,
   activeColorPopover: null, // "color" | "bg" | null
@@ -701,14 +702,30 @@ const Tools = {
         return;
       }
 
-      // Handle Text Tool (Photoshop-Grade On-Canvas Insertion)
+      // Handle Text Tool (Photoshop-Grade On-Canvas Insertion & In-Place Re-Editing)
       if (this.currentTool === "text") {
         if (e.target.id === "canvas-text-editor" || e.target.closest("#canvas-text-editor")) {
           return;
         }
+
+        // Check if user clicked on an existing text layer!
+        const hitTextLayer = Layers.findTextLayerAt(coords.x, coords.y);
+        if (hitTextLayer) {
+          if (this.textEditing && this.editingLayer === hitTextLayer) {
+            return; // Already editing this text
+          }
+          if (this.textEditing) {
+            this.commitTextEdit();
+          }
+          this.startEditingTextLayer(hitTextLayer);
+          return;
+        }
+
+        // Otherwise, commit current edit and start a new text block
         if (this.textEditing) {
           this.commitTextEdit();
         }
+        this.editingLayer = null;
         this.startInlineTextEdit(coords.x, coords.y);
         return;
       }
@@ -977,6 +994,16 @@ const Tools = {
         History.pushState(actionKey, null, this.currentTool);
       }
     });
+
+    // DOUBLE-CLICK on canvas: auto-detect and edit text layer regardless of active tool
+    artboard.addEventListener("dblclick", (e) => {
+      const coords = Canvas.getCanvasCoords(e);
+      const hitTextLayer = Layers.findTextLayerAt(coords.x, coords.y);
+      if (hitTextLayer) {
+        this.select("text");
+        this.startEditingTextLayer(hitTextLayer);
+      }
+    });
   },
 
   // Soft & Hard Brush Engine
@@ -1230,6 +1257,16 @@ const Tools = {
 
     layer.ctx.clearRect(0, 0, layer.width, layer.height);
     layer.ctx.drawImage(temp, dx, dy);
+
+    // Keep text coordinates in sync when layer is moved!
+    if (layer.isTextLayer && layer.textData) {
+      layer.textData.x += dx;
+      layer.textData.y += dy;
+      if (layer.textData.bbox) {
+        layer.textData.bbox.x += dx;
+        layer.textData.bbox.y += dy;
+      }
+    }
   },
 
   // Magic Wand Tool Detection
@@ -1537,6 +1574,7 @@ const Tools = {
       this.commitTextEdit();
     }
 
+    this.editingLayer = null; // New text block
     this.textX = Math.round(x);
     this.textY = Math.round(y);
     this.textEditing = true;
@@ -1565,6 +1603,120 @@ const Tools = {
     }, 15);
 
     this.updateOptionsBar("text");
+  },
+
+  startEditingTextLayer(layer) {
+    const editor = document.getElementById("canvas-text-editor");
+    if (!editor || !layer || !layer.textData) return;
+
+    // Commit any currently active text edit first
+    if (this.textEditing && this.editingLayer !== layer) {
+      this.commitTextEdit();
+    }
+
+    const td = layer.textData;
+    this.editingLayer = layer;
+    this.fontFamily = td.fontFamily || this.fontFamily;
+    this.fontSize = td.fontSize || this.fontSize;
+    this.fontWeight = td.fontWeight || this.fontWeight;
+    this.fontStyle = td.fontStyle || this.fontStyle;
+    this.textAlign = td.textAlign || this.textAlign;
+    this.fontColor = td.fontColor || this.fontColor;
+    this.textBgColor = td.textBgColor || "transparent";
+    this.textX = td.x !== undefined ? td.x : 100;
+    this.textY = td.y !== undefined ? td.y : 100;
+    this.textEditing = true;
+
+    // Select this layer in the Layers panel
+    const idx = Layers.layers.indexOf(layer);
+    if (idx !== -1) {
+      Layers.setActiveLayer(idx);
+    }
+
+    // Clear the layer canvas while editing in live DOM so the user doesn't see doubled text
+    layer.clear();
+
+    editor.style.left = `${this.textX}px`;
+    editor.style.top = `${this.textY}px`;
+    this.applyTextStylesToEditor();
+
+    editor.innerText = td.text || "";
+    editor.classList.remove("hidden");
+
+    // Focus and select all content for immediate typing/editing
+    editor.focus();
+    setTimeout(() => {
+      try {
+        const range = document.createRange();
+        range.selectNodeContents(editor);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      } catch (err) {}
+    }, 20);
+
+    this.updateOptionsBar("text");
+  },
+
+  renderTextToLayer(targetLayer, td) {
+    if (!targetLayer || !td) return;
+    const ctx = targetLayer.ctx;
+    ctx.save();
+
+    const stylePrefix = td.fontStyle === "italic" ? "italic " : "";
+    const weightPrefix = td.fontWeight === "bold" ? "bold " : "";
+    ctx.font = `${stylePrefix}${weightPrefix}${td.fontSize}px ${td.fontFamily}`;
+    ctx.textAlign = td.textAlign;
+    ctx.textBaseline = "top";
+
+    const lines = (td.text || "").split("\n");
+    const lineHeight = td.fontSize * 1.25;
+
+    // Calculate maximum line width
+    let maxLineWidth = 0;
+    lines.forEach((line) => {
+      const metrics = ctx.measureText(line);
+      if (metrics.width > maxLineWidth) {
+        maxLineWidth = metrics.width;
+      }
+    });
+
+    const totalTextH = lines.length * lineHeight;
+    const padX = 8;
+    const padY = 4;
+
+    // Calculate bounding box for hit-testing and background
+    let bgX = td.x - padX;
+    if (td.textAlign === "center") {
+      bgX = td.x - (maxLineWidth / 2) - padX;
+    } else if (td.textAlign === "right") {
+      bgX = td.x - maxLineWidth - padX;
+    }
+    const bgY = td.y - padY;
+    const bgW = maxLineWidth + (padX * 2);
+    const bgH = totalTextH + (padY * 2);
+
+    td.bbox = { x: bgX, y: bgY, w: bgW, h: bgH };
+
+    // Render background if not transparent
+    if (td.textBgColor && td.textBgColor !== "transparent") {
+      ctx.fillStyle = td.textBgColor;
+      ctx.beginPath();
+      if (typeof ctx.roundRect === "function") {
+        ctx.roundRect(bgX, bgY, bgW, bgH, 4);
+      } else {
+        ctx.rect(bgX, bgY, bgW, bgH);
+      }
+      ctx.fill();
+    }
+
+    // Render text lines
+    ctx.fillStyle = td.fontColor || "#000000";
+    lines.forEach((line, idx) => {
+      ctx.fillText(line, td.x, td.y + (idx * lineHeight));
+    });
+
+    ctx.restore();
   },
 
   applyTextStylesToEditor() {
@@ -1661,71 +1813,42 @@ const Tools = {
     }
 
     const snippet = rawText.replace(/\s+/g, ' ').substring(0, 16);
-    let targetLayer = Layers.getActiveLayer();
-    // Auto-create dedicated layer for text if on locked/background layer
-    if (!targetLayer || targetLayer.locked || targetLayer.isBackground) {
+    let targetLayer = this.editingLayer;
+
+    if (targetLayer) {
+      // Re-editing an existing text layer: update in-place!
+      targetLayer.clear();
+      targetLayer.name = `Text: ${snippet}`;
+    } else {
+      // Creating a new text layer:
       targetLayer = Layers.createLayer(`Text: ${snippet}`, false);
+      targetLayer.isTextLayer = true;
     }
 
-    const lines = (editor.innerText || editor.textContent || "").split("\n");
-    const ctx = targetLayer.ctx;
-    ctx.save();
+    const td = {
+      text: rawText,
+      fontFamily: this.fontFamily,
+      fontSize: this.fontSize,
+      fontWeight: this.fontWeight,
+      fontStyle: this.fontStyle,
+      textAlign: this.textAlign,
+      fontColor: this.fontColor || "#000000",
+      textBgColor: this.textBgColor || "transparent",
+      x: this.textX,
+      y: this.textY
+    };
 
-    const stylePrefix = this.fontStyle === "italic" ? "italic " : "";
-    const weightPrefix = this.fontWeight === "bold" ? "bold " : "";
-    ctx.font = `${stylePrefix}${weightPrefix}${this.fontSize}px ${this.fontFamily}`;
-    ctx.textAlign = this.textAlign;
-    ctx.textBaseline = "top";
+    targetLayer.isTextLayer = true;
+    targetLayer.textData = td;
 
-    const lineHeight = this.fontSize * 1.25;
-
-    // Calculate maximum line width
-    let maxLineWidth = 0;
-    lines.forEach((line) => {
-      const metrics = ctx.measureText(line);
-      if (metrics.width > maxLineWidth) {
-        maxLineWidth = metrics.width;
-      }
-    });
-
-    const totalTextH = lines.length * lineHeight;
-    const padX = 8;
-    const padY = 4;
-
-    // Render background if not transparent
-    if (this.textBgColor && this.textBgColor !== "transparent") {
-      let bgX = this.textX - padX;
-      if (this.textAlign === "center") {
-        bgX = this.textX - (maxLineWidth / 2) - padX;
-      } else if (this.textAlign === "right") {
-        bgX = this.textX - maxLineWidth - padX;
-      }
-      const bgY = this.textY - padY;
-      const bgW = maxLineWidth + (padX * 2);
-      const bgH = totalTextH + (padY * 2);
-
-      ctx.fillStyle = this.textBgColor;
-      ctx.beginPath();
-      if (typeof ctx.roundRect === "function") {
-        ctx.roundRect(bgX, bgY, bgW, bgH, 4);
-      } else {
-        ctx.rect(bgX, bgY, bgW, bgH);
-      }
-      ctx.fill();
-    }
-
-    // Render text lines
-    ctx.fillStyle = this.fontColor || "#000000";
-    lines.forEach((line, idx) => {
-      ctx.fillText(line, this.textX, this.textY + (idx * lineHeight));
-    });
-
-    ctx.restore();
+    // Render to layer
+    this.renderTextToLayer(targetLayer, td);
 
     // Reset and hide inline editor
     editor.innerText = "";
     editor.classList.add("hidden");
     this.textEditing = false;
+    this.editingLayer = null;
     this.activeColorPopover = null;
 
     Layers.renderLayersPanel();
@@ -1739,7 +1862,15 @@ const Tools = {
       editor.innerText = "";
       editor.classList.add("hidden");
     }
+
+    // If we were re-editing an existing layer, restore its previous text onto the canvas!
+    if (this.editingLayer && this.editingLayer.textData) {
+      this.editingLayer.clear();
+      this.renderTextToLayer(this.editingLayer, this.editingLayer.textData);
+    }
+
     this.textEditing = false;
+    this.editingLayer = null;
     this.activeColorPopover = null;
     this.updateOptionsBar("text");
   },

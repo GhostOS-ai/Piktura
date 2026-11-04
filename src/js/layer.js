@@ -12,6 +12,8 @@ class Layer {
     this.visible = true;
     this.locked = false;
     this.isBackground = isBackground;
+    this.isTextLayer = false;
+    this.textData = null;
     this.mask = null; // Optional grayscale mask canvas
 
     // The offscreen render canvas for this layer's pixel content
@@ -52,6 +54,8 @@ class Layer {
     copy.opacity = this.opacity;
     copy.blendMode = this.blendMode;
     copy.visible = this.visible;
+    copy.isTextLayer = this.isTextLayer;
+    copy.textData = this.textData ? JSON.parse(JSON.stringify(this.textData)) : null;
     copy.ctx.drawImage(this.canvas, 0, 0);
     return copy;
   }
@@ -241,6 +245,44 @@ const Layers = {
     if (opacityInput) opacityInput.value = Math.round(active.opacity * 100);
   },
 
+  findTextLayerAt(x, y) {
+    // Check active layer first if it is a visible text layer
+    const active = this.getActiveLayer();
+    if (active && active.visible && active.isTextLayer && active.textData && active.textData.bbox) {
+      const b = active.textData.bbox;
+      const pad = 12;
+      if (x >= b.x - pad && x <= b.x + b.w + pad && y >= b.y - pad && y <= b.y + b.h + pad) {
+        return active;
+      }
+    }
+
+    // Search all other visible text layers in top-to-bottom visual order (highest index to lowest)
+    for (let i = this.layers.length - 1; i >= 0; i--) {
+      const l = this.layers[i];
+      if (l.visible && l.isTextLayer && l.textData && l.textData.bbox) {
+        const b = l.textData.bbox;
+        const pad = 12;
+        if (x >= b.x - pad && x <= b.x + b.w + pad && y >= b.y - pad && y <= b.y + b.h + pad) {
+          return l;
+        }
+      }
+    }
+    return null;
+  },
+
+  editLayerText(index) {
+    if (index >= 0 && index < this.layers.length) {
+      const layer = this.layers[index];
+      if (layer && layer.isTextLayer && layer.textData) {
+        this.setActiveLayer(index);
+        if (window.Tools) {
+          Tools.select("text");
+          Tools.startEditingTextLayer(layer);
+        }
+      }
+    }
+  },
+
   renderLayersPanel() {
     const stackEl = document.getElementById("layers-stack-list");
     if (!stackEl) return;
@@ -253,14 +295,23 @@ const Layers = {
       const eyeIcon = layer.visible ? "👁" : "—";
       const eyeClass = layer.visible ? "" : "hidden";
       const lockIcon = layer.isBackground ? "🔒" : "";
+      const isText = layer.isTextLayer && layer.textData;
+
+      const thumbContent = isText
+        ? `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#1b2234; border-radius:2px;"><span style="font-weight:900; font-family:serif; font-size:16px; color:#60a5fa;">T</span></div>`
+        : `<canvas id="thumb-cvs-${layer.id}" width="40" height="28"></canvas>`;
 
       return `
-        <div class="layer-row ${isActive}" onclick="Layers.setActiveLayer(${index})" data-layer-idx="${index}">
+        <div class="layer-row ${isActive} ${isText ? 'text-layer-row' : ''}" 
+             onclick="Layers.setActiveLayer(${index})" 
+             ondblclick="Layers.editLayerText(${index})" 
+             data-layer-idx="${index}"
+             title="${isText ? 'Double-click to edit text' : ''}">
           <button class="layer-visibility-btn ${eyeClass}" onclick="event.stopPropagation(); Layers.toggleVisibility(${index})" title="Toggle Visibility">
             ${eyeIcon}
           </button>
           <div class="layer-thumb-box" id="thumb-box-${layer.id}">
-            <canvas id="thumb-cvs-${layer.id}" width="40" height="28"></canvas>
+            ${thumbContent}
           </div>
           <div class="layer-info">
             <span class="layer-name">${layer.name}</span>
@@ -277,11 +328,13 @@ const Layers = {
 
     // Update thumbnails
     reversed.forEach(({ layer }) => {
-      const thumbCvs = document.getElementById(`thumb-cvs-${layer.id}`);
-      if (thumbCvs) {
-        const tCtx = thumbCvs.getContext("2d");
-        tCtx.clearRect(0, 0, 40, 28);
-        tCtx.drawImage(layer.canvas, 0, 0, 40, 28);
+      if (!layer.isTextLayer) {
+        const thumbCvs = document.getElementById(`thumb-cvs-${layer.id}`);
+        if (thumbCvs) {
+          const tCtx = thumbCvs.getContext("2d");
+          tCtx.clearRect(0, 0, 40, 28);
+          tCtx.drawImage(layer.canvas, 0, 0, 40, 28);
+        }
       }
     });
 
@@ -301,6 +354,8 @@ const Layers = {
       opacity: layer.opacity,
       blendMode: layer.blendMode,
       visible: layer.visible,
+      isTextLayer: !!layer.isTextLayer,
+      textData: layer.textData ? JSON.parse(JSON.stringify(layer.textData)) : null,
       dataUrl: layer.canvas.toDataURL("image/png")
     }));
   },
@@ -316,6 +371,8 @@ const Layers = {
       layer.opacity = item.opacity;
       layer.blendMode = item.blendMode;
       layer.visible = item.visible;
+      layer.isTextLayer = !!item.isTextLayer;
+      layer.textData = item.textData || null;
 
       const img = new Image();
       img.onload = () => {

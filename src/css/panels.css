@@ -223,6 +223,11 @@
   border-left: 3px solid var(--ps-accent-bright);
 }
 
+.layer-row.text-layer-row .layer-name {
+  color: #93c5fd;
+  font-weight: 500;
+}
+
 .layer-visibility-btn {
   background: transparent;
   border: none;

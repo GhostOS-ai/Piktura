@@ -2,7 +2,7 @@
  * Piktura Studio — Core Application Coordinator & Menus
  */
 const App = {
-  version: "1.1.4",
+  version: "1.1.5",
 
   init() {
     I18n.init();
