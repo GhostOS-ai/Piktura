@@ -66,26 +66,27 @@ const Tools = {
     const container = document.getElementById("options-dynamic-container");
     if (!container) return;
 
+    const t = (k) => (window.I18n ? I18n.t(k) : k);
     const toolMeta = {
-      move: { name: "Move Tool", icon: "✥" },
-      marquee: { name: "Marquee Tool", icon: "⬚" },
-      lasso: { name: "Lasso Tool", icon: "➰" },
-      wand: { name: "Magic Wand", icon: "🪄" },
-      crop: { name: "Crop Tool", icon: "⯐" },
-      eyedropper: { name: "Eyedropper", icon: "💧" },
-      healing: { name: "Spot Healing", icon: "🩹" },
-      brush: { name: "Brush Tool", icon: "🖌️" },
-      stamp: { name: "Clone Stamp", icon: "⚚" },
-      "history-brush": { name: "History Brush", icon: "📜" },
-      eraser: { name: "Eraser Tool", icon: "🧹" },
-      gradient: { name: "Gradient Tool", icon: "▨" },
-      bucket: { name: "Paint Bucket", icon: "🪣" },
-      dodge: { name: "Dodge & Burn", icon: "☀️" },
-      pen: { name: "Pen Tool", icon: "✒️" },
-      text: { name: "Horizontal Type", icon: "T" },
-      shape: { name: "Shape Tool", icon: "▭" },
-      hand: { name: "Hand Tool", icon: "✋" },
-      zoom: { name: "Zoom Tool", icon: "🔍" }
+      move: { name: t("tool_move"), icon: "✥" },
+      marquee: { name: t("tool_marquee"), icon: "⬚" },
+      lasso: { name: t("tool_lasso"), icon: "➰" },
+      wand: { name: t("tool_wand"), icon: "🪄" },
+      crop: { name: t("tool_crop"), icon: "⯐" },
+      eyedropper: { name: t("tool_eyedropper"), icon: "💧" },
+      healing: { name: t("tool_healing"), icon: "🩹" },
+      brush: { name: t("tool_brush"), icon: "🖌️" },
+      stamp: { name: t("tool_stamp"), icon: "⚚" },
+      "history-brush": { name: t("tool_history_brush"), icon: "📜" },
+      eraser: { name: t("tool_eraser"), icon: "🧹" },
+      gradient: { name: t("tool_gradient"), icon: "▨" },
+      bucket: { name: t("tool_bucket"), icon: "🪣" },
+      dodge: { name: t("tool_dodge"), icon: "☀️" },
+      pen: { name: t("tool_pen"), icon: "✒️" },
+      text: { name: t("tool_text"), icon: "T" },
+      shape: { name: t("tool_shape"), icon: "▭" },
+      hand: { name: t("tool_hand"), icon: "✋" },
+      zoom: { name: t("tool_zoom"), icon: "🔍" }
     };
 
     const meta = toolMeta[tool] || { name: tool, icon: "🛠️" };
@@ -96,15 +97,15 @@ const Tools = {
     if (tool === "brush" || tool === "eraser" || tool === "stamp" || tool === "healing") {
       container.innerHTML = `
         <div class="opt-group">
-          <label>Size:</label>
+          <label>${t("opt_size")}</label>
           <input type="range" min="1" max="500" value="${this.brushSize}" oninput="Tools.setBrushSize(this.value)">
           <span class="opt-val">${this.brushSize} px</span>
 
-          <label>Hardness:</label>
+          <label>${t("opt_hardness")}</label>
           <input type="range" min="0" max="100" value="${this.brushHardness}" oninput="Tools.setBrushHardness(this.value)">
           <span class="opt-val">${this.brushHardness}%</span>
 
-          <label>Opacity:</label>
+          <label>${t("opt_opacity")}</label>
           <input type="range" min="1" max="100" value="${Math.round(this.brushOpacity * 100)}" oninput="Tools.setBrushOpacity(this.value)">
           <span class="opt-val">${Math.round(this.brushOpacity * 100)}%</span>
         </div>
@@ -112,25 +113,25 @@ const Tools = {
     } else if (tool === "marquee") {
       container.innerHTML = `
         <div class="opt-group">
-          <label>Style:</label>
+          <label>${t("opt_style")}</label>
           <select class="ps-select" onchange="Tools.marqueeStyle = this.value">
             <option value="normal">Normal (Freeform)</option>
             <option value="fixed-ratio">Fixed Ratio (1:1)</option>
           </select>
-          <label style="margin-left:12px">Feather:</label>
+          <label style="margin-left:12px">${t("opt_feather")}</label>
           <input type="number" class="ps-num-input" style="width:50px" value="0" min="0" max="100"> px
-          <button class="ps-btn secondary" style="margin-left:12px; height:22px; padding:0 8px; font-size:11px;" onclick="Selection.deselect()">Deselect (⌘D)</button>
+          <button class="ps-btn secondary" style="margin-left:12px; height:22px; padding:0 8px; font-size:11px;" onclick="Selection.deselect()">${t("menu_deselect")}</button>
         </div>
       `;
     } else if (tool === "gradient") {
       container.innerHTML = `
         <div class="opt-group">
-          <label>Type:</label>
+          <label>${t("opt_type")}</label>
           <select class="ps-select" onchange="Tools.gradientType = this.value">
             <option value="linear" ${this.gradientType === 'linear' ? 'selected' : ''}>Linear Gradient</option>
             <option value="radial" ${this.gradientType === 'radial' ? 'selected' : ''}>Radial Gradient</option>
           </select>
-          <label style="margin-left:12px">Colors:</label>
+          <label style="margin-left:12px">${t("opt_colors")}</label>
           <select class="ps-select" onchange="Tools.gradientFill = this.value">
             <option value="fg-bg" ${this.gradientFill === 'fg-bg' ? 'selected' : ''}>Foreground to Background</option>
             <option value="fg-trans" ${this.gradientFill === 'fg-trans' ? 'selected' : ''}>Foreground to Transparent</option>
@@ -140,25 +141,25 @@ const Tools = {
     } else if (tool === "shape") {
       container.innerHTML = `
         <div class="opt-group">
-          <label>Shape:</label>
+          <label>${t("opt_shape")}</label>
           <select class="ps-select" onchange="Tools.shapeType = this.value">
             <option value="rect" ${this.shapeType === 'rect' ? 'selected' : ''}>Rectangle</option>
             <option value="roundrect" ${this.shapeType === 'roundrect' ? 'selected' : ''}>Rounded Rectangle</option>
             <option value="ellipse" ${this.shapeType === 'ellipse' ? 'selected' : ''}>Ellipse / Circle</option>
             <option value="line" ${this.shapeType === 'line' ? 'selected' : ''}>Line</option>
           </select>
-          <label style="margin-left:12px"><input type="checkbox" ${this.shapeFilled ? 'checked' : ''} onchange="Tools.shapeFilled = this.checked"> Fill Shape</label>
+          <label style="margin-left:12px"><input type="checkbox" ${this.shapeFilled ? 'checked' : ''} onchange="Tools.shapeFilled = this.checked"> ${t("opt_fill")}</label>
         </div>
       `;
     } else if (tool === "dodge") {
       container.innerHTML = `
         <div class="opt-group">
-          <label>Mode:</label>
+          <label>${t("opt_mode")}</label>
           <select class="ps-select" onchange="Tools.dodgeMode = this.value">
             <option value="dodge" ${this.dodgeMode === 'dodge' ? 'selected' : ''}>Dodge (Lighten)</option>
             <option value="burn" ${this.dodgeMode === 'burn' ? 'selected' : ''}>Burn (Darken)</option>
           </select>
-          <label style="margin-left:12px">Exposure:</label>
+          <label style="margin-left:12px">${t("opt_exposure")}</label>
           <input type="range" min="5" max="100" value="${Math.round(this.dodgeExposure * 100)}" oninput="Tools.dodgeExposure = this.value / 100; this.nextElementSibling.innerText = this.value + '%'">
           <span class="opt-val">${Math.round(this.dodgeExposure * 100)}%</span>
         </div>
@@ -166,7 +167,7 @@ const Tools = {
     } else if (tool === "text") {
       container.innerHTML = `
         <div class="opt-group">
-          <label>Font:</label>
+          <label>${t("opt_font")}</label>
           <select class="ps-select" onchange="Tools.fontFamily = this.value">
             <option value="Helvetica Neue">Helvetica Neue</option>
             <option value="-apple-system, BlinkMacSystemFont, sans-serif">Apple SF Pro</option>
@@ -175,15 +176,14 @@ const Tools = {
             <option value="Times New Roman">Times New Roman</option>
             <option value="Courier New">Courier New</option>
           </select>
-          <label style="margin-left:12px">Size:</label>
+          <label style="margin-left:12px">${t("opt_size")}</label>
           <input type="number" class="ps-num-input" style="width:55px" value="${this.fontSize}" min="8" max="250" onchange="Tools.fontSize = parseInt(this.value, 10)"> pt
-          <label style="margin-left:12px">Style:</label>
+          <label style="margin-left:12px">${t("opt_style")}</label>
           <select class="ps-select" onchange="Tools.fontStyle = this.value">
             <option value="normal">Regular</option>
             <option value="bold">Bold</option>
             <option value="italic">Italic</option>
           </select>
-          <span style="margin-left:16px; color:var(--ps-text-dim); font-size:11px;">(Click on canvas to type)</span>
         </div>
       `;
     } else {

@@ -14,6 +14,8 @@ webview.settings['DRAG_REGION_DIRECT_TARGET_ONLY'] = True
 class PikturaBridgeAPI:
     def __init__(self, window=None):
         self.window = window
+        self.is_maximized = False
+        self.prev_bounds = None
 
     def set_window(self, window):
         self.window = window
@@ -23,9 +25,46 @@ class PikturaBridgeAPI:
             self.window.minimize()
 
     def toggle_maximize(self):
-        if self.window:
-            # Toggle fullscreen or maximize
-            pass
+        if not self.window:
+            return
+        if sys.platform == "darwin":
+            try:
+                from AppKit import NSScreen
+                screen = NSScreen.mainScreen()
+                vis = screen.visibleFrame()
+                full = screen.frame()
+
+                # AppKit coordinate system has (0,0) at bottom-left
+                # pywebview coordinate system has (0,0) at top-left
+                top_y = int(full.size.height - (vis.origin.y + vis.size.height))
+                left_x = int(vis.origin.x)
+                vis_w = int(vis.size.width)
+                vis_h = int(vis.size.height)
+
+                if not self.is_maximized:
+                    self.prev_bounds = (self.window.x, self.window.y, self.window.width, self.window.height)
+                    self.window.move(left_x, top_y)
+                    self.window.resize(vis_w, vis_h)
+                    self.is_maximized = True
+                else:
+                    if self.prev_bounds:
+                        px, py, pw, ph = self.prev_bounds
+                        self.window.move(px, py)
+                        self.window.resize(pw, ph)
+                    else:
+                        self.window.resize(1340, 840)
+                    self.is_maximized = False
+                return
+            except Exception:
+                pass
+
+        # Fallback for non-macOS
+        if not self.is_maximized:
+            self.window.maximize()
+            self.is_maximized = True
+        else:
+            self.window.restore()
+            self.is_maximized = False
 
     def close(self):
         if self.window:

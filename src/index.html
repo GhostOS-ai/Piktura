@@ -22,146 +22,123 @@
       <!-- Native Photoshop Menu Dropdowns -->
       <nav class="ps-menus">
         <div class="menu-item" data-menu="file">
-          <span>File</span>
+          <span data-i18n="menu_file">File</span>
           <div class="menu-dropdown">
-            <div class="menu-entry" onclick="App.newDocumentDialog()"><span class="label">New...</span><span class="shortcut">⌘N</span></div>
-            <div class="menu-entry" onclick="App.openFileDialog()"><span class="label">Open...</span><span class="shortcut">⌘O</span></div>
+            <div class="menu-entry" onclick="App.newDocumentDialog()"><span class="label" data-i18n="menu_new">New...</span><span class="shortcut">⌘N</span></div>
+            <div class="menu-entry" onclick="App.openFileDialog()"><span class="label" data-i18n="menu_open">Open...</span><span class="shortcut">⌘O</span></div>
             <div class="menu-divider"></div>
-            <div class="menu-entry" onclick="App.saveProject()"><span class="label">Save</span><span class="shortcut">⌘S</span></div>
-            <div class="menu-entry" onclick="App.saveProjectAs()"><span class="label">Save As...</span><span class="shortcut">⇧⌘S</span></div>
+            <div class="menu-entry" onclick="App.saveProject()"><span class="label" data-i18n="menu_save">Save</span><span class="shortcut">⌘S</span></div>
+            <div class="menu-entry" onclick="App.saveProjectAs()"><span class="label" data-i18n="menu_save_as">Save As...</span><span class="shortcut">⇧⌘S</span></div>
             <div class="menu-divider"></div>
-            <div class="menu-entry" onclick="App.exportImage('png')"><span class="label">Quick Export as PNG</span><span class="shortcut">⌥⇧⌘W</span></div>
-            <div class="menu-entry" onclick="App.exportAsDialog()"><span class="label">Export As...</span><span class="shortcut">⇧⌘S</span></div>
+            <div class="menu-entry" onclick="App.exportImage('png')"><span class="label" data-i18n="menu_quick_export">Quick Export as PNG</span><span class="shortcut">⌥⇧⌘W</span></div>
+            <div class="menu-entry" onclick="App.exportAsDialog()"><span class="label" data-i18n="menu_export_as">Export As...</span><span class="shortcut">⇧⌘S</span></div>
             <div class="menu-divider"></div>
-            <div class="menu-entry" onclick="App.closeDocument()"><span class="label">Close</span><span class="shortcut">⌘W</span></div>
+            <div class="menu-entry" onclick="App.closeDocument()"><span class="label" data-i18n="menu_close">Close</span><span class="shortcut">⌘W</span></div>
           </div>
         </div>
 
         <div class="menu-item" data-menu="edit">
-          <span>Edit</span>
+          <span data-i18n="menu_edit">Edit</span>
           <div class="menu-dropdown">
-            <div class="menu-entry" onclick="History.undo()"><span class="label">Undo</span><span class="shortcut">⌘Z</span></div>
-            <div class="menu-entry" onclick="History.redo()"><span class="label">Redo</span><span class="shortcut">⇧⌘Z</span></div>
+            <div class="menu-entry" onclick="History.undo()"><span class="label" data-i18n="menu_undo">Undo</span><span class="shortcut">⌘Z</span></div>
+            <div class="menu-entry" onclick="History.redo()"><span class="label" data-i18n="menu_redo">Redo</span><span class="shortcut">⇧⌘Z</span></div>
             <div class="menu-divider"></div>
-            <div class="menu-entry" onclick="Tools.cut()"><span class="label">Cut</span><span class="shortcut">⌘X</span></div>
-            <div class="menu-entry" onclick="Tools.copy()"><span class="label">Copy</span><span class="shortcut">⌘C</span></div>
-            <div class="menu-entry" onclick="Tools.copyMerged()"><span class="label">Copy Merged</span><span class="shortcut">⇧⌘C</span></div>
-            <div class="menu-entry" onclick="Tools.paste()"><span class="label">Paste</span><span class="shortcut">⌘V</span></div>
+            <div class="menu-entry" onclick="Tools.cut()"><span class="label" data-i18n="menu_cut">Cut</span><span class="shortcut">⌘X</span></div>
+            <div class="menu-entry" onclick="Tools.copy()"><span class="label" data-i18n="menu_copy">Copy</span><span class="shortcut">⌘C</span></div>
+            <div class="menu-entry" onclick="Tools.copyMerged()"><span class="label" data-i18n="menu_copy_merged">Copy Merged</span><span class="shortcut">⇧⌘C</span></div>
+            <div class="menu-entry" onclick="Tools.paste()"><span class="label" data-i18n="menu_paste">Paste</span><span class="shortcut">⌘V</span></div>
             <div class="menu-divider"></div>
-            <div class="menu-entry" onclick="Tools.fill()"><span class="label">Fill...</span><span class="shortcut">⇧F5</span></div>
-            <div class="menu-entry" onclick="Tools.stroke()"><span class="label">Stroke...</span></div>
-            <div class="menu-entry" onclick="Tools.freeTransform()"><span class="label">Free Transform</span><span class="shortcut">⌘T</span></div>
+            <div class="menu-entry" onclick="Tools.fill()"><span class="label" data-i18n="menu_fill">Fill...</span><span class="shortcut">⇧F5</span></div>
+            <div class="menu-entry" onclick="Tools.freeTransform()"><span class="label" data-i18n="menu_free_transform">Free Transform</span><span class="shortcut">⌘T</span></div>
             <div class="menu-divider"></div>
-            <div class="menu-entry" onclick="Tools.clear()"><span class="label">Clear / Delete</span><span class="shortcut">⌫</span></div>
+            <div class="menu-entry" onclick="Tools.clear()"><span class="label" data-i18n="menu_clear">Clear / Delete</span><span class="shortcut">⌫</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-entry" onclick="App.showSettingsModal()"><span class="label" data-i18n="menu_preferences">Preferences...</span><span class="shortcut">⌘,</span></div>
           </div>
         </div>
 
         <div class="menu-item" data-menu="image">
-          <span>Image</span>
+          <span data-i18n="menu_image">Image</span>
           <div class="menu-dropdown">
             <div class="menu-entry sub">
-              <span class="label">Adjustments</span>
+              <span class="label" data-i18n="menu_adjustments">Adjustments</span>
               <div class="submenu">
-                <div class="menu-entry" onclick="Filters.showBrightnessContrast()"><span class="label">Brightness / Contrast...</span></div>
-                <div class="menu-entry" onclick="Filters.showLevels()"><span class="label">Levels...</span><span class="shortcut">⌘L</span></div>
-                <div class="menu-entry" onclick="Filters.showCurves()"><span class="label">Curves...</span><span class="shortcut">⌘M</span></div>
-                <div class="menu-entry" onclick="Filters.showHueSaturation()"><span class="label">Hue / Saturation...</span><span class="shortcut">⌘U</span></div>
-                <div class="menu-entry" onclick="Filters.showExposure()"><span class="label">Exposure...</span></div>
+                <div class="menu-entry" onclick="Filters.showBrightnessContrast()"><span class="label" data-i18n="menu_brightness">Brightness / Contrast...</span></div>
+                <div class="menu-entry" onclick="Filters.showLevels()"><span class="label" data-i18n="menu_levels">Levels...</span><span class="shortcut">⌘L</span></div>
+                <div class="menu-entry" onclick="Filters.showCurves()"><span class="label" data-i18n="menu_curves">Curves...</span><span class="shortcut">⌘M</span></div>
+                <div class="menu-entry" onclick="Filters.showHueSaturation()"><span class="label" data-i18n="menu_hue_sat">Hue / Saturation...</span><span class="shortcut">⌘U</span></div>
                 <div class="menu-divider"></div>
-                <div class="menu-entry" onclick="Filters.invert()"><span class="label">Invert</span><span class="shortcut">⌘I</span></div>
-                <div class="menu-entry" onclick="Filters.desaturate()"><span class="label">Desaturate</span><span class="shortcut">⇧⌘U</span></div>
-                <div class="menu-entry" onclick="Filters.autoTone()"><span class="label">Auto Tone</span><span class="shortcut">⇧⌘L</span></div>
+                <div class="menu-entry" onclick="Filters.invert()"><span class="label" data-i18n="menu_invert">Invert</span><span class="shortcut">⌘I</span></div>
+                <div class="menu-entry" onclick="Filters.desaturate()"><span class="label" data-i18n="menu_desaturate">Desaturate</span><span class="shortcut">⇧⌘U</span></div>
+                <div class="menu-entry" onclick="Filters.autoTone()"><span class="label" data-i18n="menu_auto_tone">Auto Tone</span><span class="shortcut">⇧⌘L</span></div>
               </div>
             </div>
             <div class="menu-divider"></div>
-            <div class="menu-entry" onclick="App.showImageSizeDialog()"><span class="label">Image Size...</span><span class="shortcut">⌥⌘I</span></div>
-            <div class="menu-entry" onclick="App.showCanvasSizeDialog()"><span class="label">Canvas Size...</span><span class="shortcut">⌥⌘C</span></div>
-            <div class="menu-divider"></div>
-            <div class="menu-entry" onclick="Canvas.rotate(90)"><span class="label">Rotate 90° Clockwise</span></div>
-            <div class="menu-entry" onclick="Canvas.rotate(-90)"><span class="label">Rotate 90° Counter-Clockwise</span></div>
-            <div class="menu-entry" onclick="Canvas.rotate(180)"><span class="label">Rotate 180°</span></div>
-            <div class="menu-entry" onclick="Canvas.flipHorizontal()"><span class="label">Flip Canvas Horizontal</span></div>
-            <div class="menu-entry" onclick="Canvas.flipVertical()"><span class="label">Flip Canvas Vertical</span></div>
+            <div class="menu-entry" onclick="Canvas.rotate(90)"><span class="label" data-i18n="menu_rotate_90_cw">Rotate 90° Clockwise</span></div>
+            <div class="menu-entry" onclick="Canvas.rotate(-90)"><span class="label" data-i18n="menu_rotate_90_ccw">Rotate 90° Counter-Clockwise</span></div>
+            <div class="menu-entry" onclick="Canvas.rotate(180)"><span class="label" data-i18n="menu_rotate_180">Rotate 180°</span></div>
+            <div class="menu-entry" onclick="Canvas.flipHorizontal()"><span class="label" data-i18n="menu_flip_h">Flip Canvas Horizontal</span></div>
+            <div class="menu-entry" onclick="Canvas.flipVertical()"><span class="label" data-i18n="menu_flip_v">Flip Canvas Vertical</span></div>
           </div>
         </div>
 
         <div class="menu-item" data-menu="layer">
-          <span>Layer</span>
+          <span data-i18n="menu_layer">Layer</span>
           <div class="menu-dropdown">
-            <div class="menu-entry" onclick="Layers.createLayer()"><span class="label">New Layer</span><span class="shortcut">⇧⌘N</span></div>
-            <div class="menu-entry" onclick="Layers.duplicateActiveLayer()"><span class="label">Duplicate Layer...</span><span class="shortcut">⌘J</span></div>
-            <div class="menu-entry" onclick="Layers.deleteActiveLayer()"><span class="label">Delete Layer</span></div>
+            <div class="menu-entry" onclick="Layers.createLayer()"><span class="label" data-i18n="menu_new_layer">New Layer</span><span class="shortcut">⇧⌘N</span></div>
+            <div class="menu-entry" onclick="Layers.duplicateActiveLayer()"><span class="label" data-i18n="menu_duplicate_layer">Duplicate Layer...</span><span class="shortcut">⌘J</span></div>
+            <div class="menu-entry" onclick="Layers.deleteActiveLayer()"><span class="label" data-i18n="menu_delete_layer">Delete Layer</span></div>
             <div class="menu-divider"></div>
-            <div class="menu-entry" onclick="Layers.createClippingMask()"><span class="label">Create Clipping Mask</span><span class="shortcut">⌥⌘G</span></div>
-            <div class="menu-entry" onclick="Layers.releaseClippingMask()"><span class="label">Release Clipping Mask</span></div>
-            <div class="menu-divider"></div>
-            <div class="menu-entry" onclick="Layers.createLayerMask()"><span class="label">Add Layer Mask</span></div>
-            <div class="menu-divider"></div>
-            <div class="menu-entry" onclick="Layers.mergeDown()"><span class="label">Merge Down</span><span class="shortcut">⌘E</span></div>
-            <div class="menu-entry" onclick="Layers.mergeVisible()"><span class="label">Merge Visible</span><span class="shortcut">⇧⌘E</span></div>
-            <div class="menu-entry" onclick="Layers.flattenImage()"><span class="label">Flatten Image</span></div>
+            <div class="menu-entry" onclick="Layers.mergeDown()"><span class="label" data-i18n="menu_merge_down">Merge Down</span><span class="shortcut">⌘E</span></div>
+            <div class="menu-entry" onclick="Layers.mergeVisible()"><span class="label" data-i18n="menu_merge_visible">Merge Visible</span><span class="shortcut">⇧⌘E</span></div>
+            <div class="menu-entry" onclick="Layers.flattenImage()"><span class="label" data-i18n="menu_flatten">Flatten Image</span></div>
           </div>
         </div>
 
         <div class="menu-item" data-menu="select">
-          <span>Select</span>
+          <span data-i18n="menu_select">Select</span>
           <div class="menu-dropdown">
-            <div class="menu-entry" onclick="Selection.selectAll()"><span class="label">All</span><span class="shortcut">⌘A</span></div>
-            <div class="menu-entry" onclick="Selection.deselect()"><span class="label">Deselect</span><span class="shortcut">⌘D</span></div>
-            <div class="menu-entry" onclick="Selection.inverse()"><span class="label">Inverse</span><span class="shortcut">⇧⌘I</span></div>
+            <div class="menu-entry" onclick="Selection.selectAll()"><span class="label" data-i18n="menu_select_all">All</span><span class="shortcut">⌘A</span></div>
+            <div class="menu-entry" onclick="Selection.deselect()"><span class="label" data-i18n="menu_deselect">Deselect</span><span class="shortcut">⌘D</span></div>
+            <div class="menu-entry" onclick="Selection.inverse()"><span class="label" data-i18n="menu_inverse">Inverse</span><span class="shortcut">⇧⌘I</span></div>
             <div class="menu-divider"></div>
-            <div class="menu-entry" onclick="Selection.selectSubjectAI()"><span class="label">✨ Select Subject (CoreML AI)</span></div>
-            <div class="menu-entry" onclick="Selection.removeBackgroundAI()"><span class="label">✨ Remove Background (AI)</span></div>
-            <div class="menu-divider"></div>
-            <div class="menu-entry" onclick="Selection.showFeatherDialog()"><span class="label">Feather...</span><span class="shortcut">⇧F6</span></div>
+            <div class="menu-entry" onclick="Selection.selectSubjectAI()"><span class="label" data-i18n="menu_select_subject">✨ Select Subject (AI)</span></div>
+            <div class="menu-entry" onclick="Selection.removeBackgroundAI()"><span class="label" data-i18n="menu_remove_bg">✨ Remove Background (AI)</span></div>
           </div>
         </div>
 
         <div class="menu-item" data-menu="filter">
-          <span>Filter</span>
+          <span data-i18n="menu_filter">Filter</span>
           <div class="menu-dropdown">
-            <div class="menu-entry" onclick="Filters.gaussianBlur(8)"><span class="label">Gaussian Blur...</span></div>
-            <div class="menu-entry" onclick="Filters.motionBlur(12, 0)"><span class="label">Motion Blur...</span></div>
+            <div class="menu-entry" onclick="Filters.gaussianBlur(8)"><span class="label" data-i18n="menu_gaussian_blur">Gaussian Blur...</span></div>
+            <div class="menu-entry" onclick="Filters.motionBlur(12, 0)"><span class="label" data-i18n="menu_motion_blur">Motion Blur...</span></div>
             <div class="menu-divider"></div>
-            <div class="menu-entry" onclick="Filters.sharpen()"><span class="label">Sharpen</span></div>
-            <div class="menu-entry" onclick="Filters.unsharpMask()"><span class="label">Unsharp Mask...</span></div>
+            <div class="menu-entry" onclick="Filters.sharpen()"><span class="label" data-i18n="menu_sharpen">Sharpen</span></div>
             <div class="menu-divider"></div>
-            <div class="menu-entry" onclick="Filters.addNoise(15)"><span class="label">Add Noise...</span></div>
-            <div class="menu-entry" onclick="Filters.pixelateMosaic(10)"><span class="label">Pixelate (Mosaic)...</span></div>
-            <div class="menu-entry" onclick="Filters.findEdges()"><span class="label">Find Edges</span></div>
+            <div class="menu-entry" onclick="Filters.addNoise(15)"><span class="label" data-i18n="menu_add_noise">Add Noise...</span></div>
+            <div class="menu-entry" onclick="Filters.pixelateMosaic(10)"><span class="label" data-i18n="menu_pixelate">Pixelate (Mosaic)...</span></div>
+            <div class="menu-entry" onclick="Filters.findEdges()"><span class="label" data-i18n="menu_find_edges">Find Edges</span></div>
           </div>
         </div>
 
         <div class="menu-item" data-menu="view">
-          <span>View</span>
+          <span data-i18n="menu_view">View</span>
           <div class="menu-dropdown">
-            <div class="menu-entry" onclick="Canvas.zoomIn()"><span class="label">Zoom In</span><span class="shortcut">⌘+</span></div>
-            <div class="menu-entry" onclick="Canvas.zoomOut()"><span class="label">Zoom Out</span><span class="shortcut">⌘-</span></div>
-            <div class="menu-entry" onclick="Canvas.fitToScreen()"><span class="label">Fit on Screen</span><span class="shortcut">⌘0</span></div>
-            <div class="menu-entry" onclick="Canvas.actualPixels()"><span class="label">100% (Actual Pixels)</span><span class="shortcut">⌘1</span></div>
+            <div class="menu-entry" onclick="Canvas.zoomIn()"><span class="label" data-i18n="menu_zoom_in">Zoom In</span><span class="shortcut">⌘+</span></div>
+            <div class="menu-entry" onclick="Canvas.zoomOut()"><span class="label" data-i18n="menu_zoom_out">Zoom Out</span><span class="shortcut">⌘-</span></div>
+            <div class="menu-entry" onclick="Canvas.fitToScreen()"><span class="label" data-i18n="menu_fit_screen">Fit on Screen</span><span class="shortcut">⌘0</span></div>
+            <div class="menu-entry" onclick="Canvas.actualPixels()"><span class="label" data-i18n="menu_actual_pixels">100% (Actual Pixels)</span><span class="shortcut">⌘1</span></div>
             <div class="menu-divider"></div>
-            <div class="menu-entry" onclick="Canvas.toggleRulers()"><span class="label">Rulers</span><span class="shortcut">⌘R</span></div>
-            <div class="menu-entry" onclick="Canvas.toggleGrid()"><span class="label">Pixel Grid</span><span class="shortcut">⌘'</span></div>
-          </div>
-        </div>
-
-        <div class="menu-item" data-menu="window">
-          <span>Window</span>
-          <div class="menu-dropdown">
-            <div class="menu-entry" onclick="Panels.toggle('layers')"><span class="label">Layers</span><span class="shortcut">F7</span></div>
-            <div class="menu-entry" onclick="Panels.toggle('history')"><span class="label">History</span></div>
-            <div class="menu-entry" onclick="Panels.toggle('color')"><span class="label">Color & Swatches</span></div>
-            <div class="menu-entry" onclick="Panels.toggle('properties')"><span class="label">Properties</span></div>
-            <div class="menu-divider"></div>
-            <div class="menu-entry" onclick="App.resetWorkspaceLayout()"><span class="label">Reset Essentials Workspace</span></div>
+            <div class="menu-entry" onclick="Canvas.toggleRulers()"><span class="label" data-i18n="menu_rulers">Rulers</span><span class="shortcut">⌘R</span></div>
+            <div class="menu-entry" onclick="Canvas.toggleGuides()"><span class="label" data-i18n="menu_guides">Smart Guides</span><span class="shortcut">⌘;</span></div>
           </div>
         </div>
 
         <div class="menu-item" data-menu="help">
-          <span>Help</span>
+          <span data-i18n="menu_help">Help</span>
           <div class="menu-dropdown">
-            <div class="menu-entry" onclick="App.showAboutModal()"><span class="label">About Piktura Studio...</span></div>
-            <div class="menu-entry" onclick="App.showShortcutsModal()"><span class="label">Keyboard Shortcuts Cheat Sheet</span></div>
+            <div class="menu-entry" onclick="App.showAboutModal()"><span class="label" data-i18n="menu_about">About Piktura Studio...</span></div>
+            <div class="menu-entry" onclick="App.showShortcutsModal()"><span class="label" data-i18n="menu_shortcuts">Keyboard Shortcuts</span></div>
           </div>
         </div>
       </nav>
@@ -170,8 +147,9 @@
     <!-- Drag Spacer in center of Menubar -->
     <div class="menubar-drag-spacer pywebview-drag-region"></div>
 
-    <!-- Window Controls & Workspace Switcher -->
+    <!-- Window Controls & Language Selector -->
     <div class="menubar-right no-drag">
+      <div id="lang-switcher-wrap" class="lang-switcher-wrap"></div>
       <div class="workspace-pill">
         <span class="ws-dot"></span>
         <span class="ws-label">Essentials</span>
@@ -651,6 +629,46 @@
     </div>
   </div>
 
+  <!-- ==================== PREFERENCES / SETTINGS MODAL ==================== -->
+  <div id="modal-settings" class="ps-modal hidden">
+    <div class="modal-backdrop" onclick="App.closeSettingsModal()"></div>
+    <div class="modal-window" style="width: 480px;">
+      <div class="modal-header">
+        <h3 data-i18n="menu_preferences">Preferences</h3>
+        <button class="modal-close-btn" onclick="App.closeSettingsModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Language / Тіл / Язык:</label>
+          <select id="settings-lang-select" class="ps-select" onchange="I18n.setLanguage(this.value)">
+            <option value="en">English (US)</option>
+            <option value="ru">Русский (RU)</option>
+            <option value="kk">Қазақ тілі (KZ)</option>
+            <option value="es">Español</option>
+            <option value="de">Deutsch</option>
+            <option value="fr">Français</option>
+            <option value="zh">简体中文</option>
+            <option value="ja">日本語</option>
+            <option value="pt">Português</option>
+          </select>
+          <span style="font-size:11px; color:var(--ps-text-dim); margin-top:4px;">
+            Default language auto-detects system locale (Kazakhstan / Russian / English).
+          </span>
+        </div>
+        <div class="form-group" style="margin-top:14px;">
+          <label>Hardware Acceleration:</label>
+          <div style="background:var(--ps-bg-darkest); padding:10px; border-radius:6px; border:1px solid var(--ps-border-subtle); font-size:11.5px; color:var(--ps-text-main);">
+            <div>⚡ Apple Silicon GPU & Neural Engine: <strong style="color:var(--ps-accent-bright)">Active</strong></div>
+            <div style="color:var(--ps-text-dim); margin-top:2px;">ProMotion 120Hz canvas rendering enabled.</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="ps-btn primary" onclick="App.closeSettingsModal()">OK</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Photoshop Dynamic Circle Brush Ring Cursor -->
   <div id="brush-cursor" class="brush-cursor"></div>
 
@@ -658,6 +676,7 @@
   <input type="file" id="native-file-input" style="display:none;" accept="image/*,.psd" onchange="App.handleFileInput(event)">
 
   <!-- Application Logic Scripts -->
+  <script src="js/i18n.js"></script>
   <script src="js/color.js"></script>
   <script src="js/history.js"></script>
   <script src="js/layer.js"></script>

@@ -5,9 +5,10 @@ const App = {
   version: "1.1.0",
 
   init() {
+    I18n.init();
     ColorPicker.init();
     Layers.init(1920, 1080, "white");
-    History.pushState("New Document");
+    History.pushState(I18n.t("new_document") || "New Document");
     Canvas.init();
     Tools.init();
     this.setupGlobalKeyboardShortcuts();
@@ -105,6 +106,9 @@ const App = {
       } else if (cmd && !shift && e.code === "KeyR") {
         e.preventDefault();
         Canvas.toggleRulers();
+      } else if (cmd && !shift && (e.code === "Comma" || e.key === ",")) {
+        e.preventDefault();
+        this.showSettingsModal();
       }
 
       // Bracket Shortcuts for Brush Size & Hardness
@@ -315,6 +319,20 @@ const App = {
 
   showAboutModal() {
     alert("🎨 Piktura Studio v1.1.0\nProfessional GPU-Accelerated Creative Suite for macOS & Creators.\n\nDesigned by KIB.best • 100% Offline & Private");
+  },
+
+  showSettingsModal() {
+    const modal = document.getElementById("modal-settings");
+    const sel = document.getElementById("settings-lang-select");
+    if (sel && window.I18n) {
+      sel.value = I18n.currentLang;
+    }
+    if (modal) modal.classList.remove("hidden");
+  },
+
+  closeSettingsModal() {
+    const modal = document.getElementById("modal-settings");
+    if (modal) modal.classList.add("hidden");
   },
 
   showShortcutsModal() {
