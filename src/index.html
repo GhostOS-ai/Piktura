@@ -420,7 +420,7 @@
       <!-- Panel 2: History (Undo / Redo Stack) -->
       <div class="dock-panel" id="panel-history">
         <div class="panel-header">
-          <span class="panel-title">HISTORY</span>
+          <span class="panel-title" data-i18n="panel_history">HISTORY</span>
           <button class="panel-collapse-btn" onclick="Panels.toggleCollapse('panel-history')">▾</button>
         </div>
         <div class="panel-body">
@@ -428,9 +428,15 @@
             <!-- Dynamic History Steps -->
             <div class="history-item active" data-step="0">
               <span class="step-icon">📄</span>
-              <span class="step-label">New Document</span>
+              <span class="step-label" data-i18n="new_document">New Document</span>
             </div>
           </div>
+        </div>
+        <div class="history-footer-actions">
+          <button class="layer-action-btn" onclick="History.undo()" data-i18n-title="menu_undo" title="Undo (⌘Z)">↺</button>
+          <button class="layer-action-btn" onclick="History.redo()" data-i18n-title="menu_redo" title="Redo (⇧⌘Z)">↻</button>
+          <button class="layer-action-btn" onclick="History.clearHistory()" data-i18n-title="history_clear_all" title="Clear History Stack">🧹</button>
+          <button class="layer-action-btn" onclick="History.deleteCurrentState()" data-i18n-title="action_delete_state" title="Delete State (⌫)">🗑️</button>
         </div>
       </div>
 
@@ -904,7 +910,7 @@
       <div class="modal-body" style="text-align: center; padding: 26px 20px 20px;">
         <img src="assets/icon.png" class="about-logo-big" alt="Piktura Studio">
         <h2 class="about-app-title">Piktura Studio</h2>
-        <div class="about-version-badge">v1.2.0 • Apple Silicon Native</div>
+        <div class="about-version-badge">v1.2.1 • Apple Silicon Native</div>
         <p class="about-tagline-text" data-i18n="about_tagline">Next-Gen Professional Creative Suite</p>
         <div class="about-pills">
           <span class="about-pill">⚡ Metal GPU</span>

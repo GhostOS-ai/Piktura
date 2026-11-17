@@ -2,7 +2,7 @@
  * Piktura Studio — Core Application Coordinator & Menus
  */
 const App = {
-  version: "1.2.0",
+  version: "1.2.1",
 
   init() {
     I18n.init();
@@ -205,7 +205,18 @@ const App = {
           case "KeyD": ColorPicker.resetDefaultColors(); break;
           case "Backspace":
           case "Delete":
-            Tools.clear();
+            if (window.History && History.isHistoryFocused) {
+              History.deleteCurrentState();
+            } else if (window.Selection && Selection.activeBox) {
+              Tools.clear();
+            } else if (window.Layers && Layers.panelHasFocus && Layers.layers.length > 1) {
+              Layers.deleteActiveLayer();
+            } else {
+              // Safe undo/delete last action from history without destructively wiping layer pixels
+              if (window.History) {
+                History.deleteCurrentState();
+              }
+            }
             break;
         }
 

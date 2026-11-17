@@ -761,6 +761,16 @@ const Tools = {
       const activeLayer = Layers.getActiveLayer();
       if (!activeLayer || !activeLayer.visible || activeLayer.locked) return;
 
+      // Paint Bucket is an instant flood-fill: do NOT set isDrawing to true (prevents duplicate mouseup brush stroke)
+      if (this.currentTool === "bucket") {
+        const lx = coords.x - (activeLayer.x || 0);
+        const ly = coords.y - (activeLayer.y || 0);
+        this.floodFill(activeLayer.ctx, Math.round(lx), Math.round(ly), ColorPicker.getFgColor());
+        Layers.renderLayersPanel();
+        History.pushState("action_paint_bucket", null, "bucket");
+        return;
+      }
+
       this.isDrawing = true;
       const lx = coords.x - (activeLayer.x || 0);
       const ly = coords.y - (activeLayer.y || 0);
@@ -778,10 +788,6 @@ const Tools = {
         this.healingDot(activeLayer.ctx, lx, ly);
       } else if (this.currentTool === "blur-sharpen") {
         this.blurSharpenDot(activeLayer.ctx, lx, ly);
-      } else if (this.currentTool === "bucket") {
-        this.floodFill(activeLayer.ctx, Math.round(lx), Math.round(ly), ColorPicker.getFgColor());
-        Layers.renderLayersPanel();
-        History.pushState("action_paint_bucket", null, "bucket");
       } else if (this.currentTool === "dodge") {
         this.applyDodgeBurn(activeLayer.ctx, lx, ly);
       }
@@ -2171,11 +2177,11 @@ const Tools = {
     if (Selection.activeBox) {
       active.ctx.clearRect(Selection.activeBox.x, Selection.activeBox.y, Selection.activeBox.w, Selection.activeBox.h);
       Layers.renderLayersPanel();
-      History.pushState("action_deselect", null, "select");
+      History.pushState("action_clear_selection", null, "select");
     } else {
       active.clear();
       Layers.renderLayersPanel();
-      History.pushState("action_delete_layer", null, "layer");
+      History.pushState("action_clear_layer", null, "layer");
     }
   },
 

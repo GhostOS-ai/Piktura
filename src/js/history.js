@@ -5,6 +5,7 @@ const History = {
   stack: [],
   currentIndex: -1,
   maxStates: 50,
+  isHistoryFocused: false,
 
   /**
    * Push a state to history stack
@@ -81,6 +82,60 @@ const History = {
     }
   },
 
+  selectItem(idx, e) {
+    this.isHistoryFocused = true;
+    if (window.Layers) Layers.isLayersFocused = false;
+    this.goToState(idx);
+  },
+
+  deleteState(index) {
+    if (this.stack.length <= 1) {
+      return; // Keep initial document state
+    }
+    if (index < 0 || index >= this.stack.length) return;
+    if (index === 0) {
+      return; // Do not delete root state
+    }
+
+    // Remove state from stack
+    this.stack.splice(index, 1);
+
+    // Adjust currentIndex
+    if (index <= this.currentIndex) {
+      this.currentIndex = Math.max(0, this.currentIndex - 1);
+    }
+    if (this.currentIndex >= this.stack.length) {
+      this.currentIndex = this.stack.length - 1;
+    }
+
+    // Restore state at currentIndex
+    const targetState = this.stack[this.currentIndex];
+    if (window.Layers && targetState && targetState.snapshot) {
+      Layers.deserialize(targetState.snapshot);
+    }
+    if (window.Documents) {
+      Documents.markActiveDocDirty();
+    }
+    this.renderHistoryPanel();
+    if (window.Canvas) {
+      Canvas.redraw();
+    }
+  },
+
+  deleteCurrentState() {
+    if (this.stack.length > 1 && this.currentIndex > 0) {
+      this.deleteState(this.currentIndex);
+    }
+  },
+
+  clearHistory() {
+    if (this.stack.length <= 1) return;
+    const currentState = this.stack[this.currentIndex];
+    this.stack = [currentState];
+    this.currentIndex = 0;
+    this.renderHistoryPanel();
+  },
+
   getToolIconSvg(toolId) {
     const svgs = {
       brush: '<path d="M16.5 3.5a2.12 2.12 0 0 0-3 0L7 10l-1 4 4-1 6.5-6.5a2.12 2.12 0 0 0 0-3zM7 10l3 3M3 17c1.5 0 2.5-.5 3-1.5L5 14.5 3.5 13C2.5 13.5 2 14.5 2 16a1 1 0 0 0 1 1z"/>',
@@ -121,11 +176,14 @@ const History = {
       const label = (window.I18n && I18n.t(item.nameOrKey)) || item.name || item.nameOrKey;
       const fullLabel = item.details ? `${label} ${item.details}` : label;
       const iconSvg = this.getToolIconSvg(item.toolId);
+      const delTitle = (window.I18n && I18n.t("action_delete_state")) || "Delete state";
+      const delBtn = idx > 0 ? `<button class="history-item-del-btn" onclick="event.stopPropagation(); History.deleteState(${idx});" title="${delTitle}">✕</button>` : "";
 
       return `
-        <div class="history-item ${isActive}" onclick="History.goToState(${idx})" data-step="${idx}" title="${fullLabel}">
+        <div class="history-item ${isActive}" onclick="History.selectItem(${idx}, event)" data-step="${idx}" title="${fullLabel}">
           <span class="step-icon">${iconSvg}</span>
           <span class="step-label">${fullLabel}</span>
+          ${delBtn}
         </div>
       `;
     }).join("");

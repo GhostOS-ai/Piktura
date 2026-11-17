@@ -74,6 +74,7 @@ class Layer {
 const Layers = {
   layers: [],
   activeLayerIndex: 0,
+  panelHasFocus: false,
   docWidth: 1920,
   docHeight: 1080,
 
@@ -129,6 +130,8 @@ const Layers = {
   setActiveLayer(index) {
     if (index >= 0 && index < this.layers.length) {
       this.activeLayerIndex = index;
+      this.panelHasFocus = true;
+      if (window.History) History.isHistoryFocused = false;
       this.updateLayerControls();
       this.renderLayersPanel();
     }
@@ -179,7 +182,7 @@ const Layers = {
     const active = this.getActiveLayer();
     if (active) {
       active.setOpacity(percent / 100);
-      History.pushState("Opacity Change", null, "layer", `${percent}%`);
+      History.pushState("action_opacity_change", null, "layer", `${percent}%`);
     }
   },
 
@@ -187,7 +190,7 @@ const Layers = {
     const active = this.getActiveLayer();
     if (active) {
       active.setBlendMode(mode);
-      History.pushState("Blend Mode Change", null, "layer", mode);
+      History.pushState("action_blend_mode", null, "layer", mode);
     }
   },
 

@@ -46,7 +46,7 @@
 
 | Asset | Platform | Architecture | Link |
 | :--- | :--- | :--- | :--- |
-| **Piktura Studio v1.2.0** | macOS 11.0+ (Big Sur – Sequoia) | Apple Silicon (M1 / M2 / M3 / M4) | [⬇️ Download `.zip`](https://github.com/GhostOS-ai/Piktura/releases/latest/download/Piktura-macOS-AppleSilicon.zip) |
+| **Piktura Studio v1.2.1** | macOS 11.0+ (Big Sur – Sequoia) | Apple Silicon (M1 / M2 / M3 / M4) | [⬇️ Download `.zip`](https://github.com/GhostOS-ai/Piktura/releases/latest/download/Piktura-macOS-AppleSilicon.zip) |
 
 ```bash
 # Quick run from terminal
