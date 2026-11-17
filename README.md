@@ -46,7 +46,7 @@
 
 | Asset | Platform | Architecture | Link |
 | :--- | :--- | :--- | :--- |
-| **Piktura Studio v1.1.3** | macOS 11.0+ (Big Sur – Sequoia) | Apple Silicon (M1 / M2 / M3 / M4) | [⬇️ Download `.zip`](https://github.com/GhostOS-ai/Piktura/releases/latest/download/Piktura-macOS-AppleSilicon.zip) |
+| **Piktura Studio v1.2.0** | macOS 11.0+ (Big Sur – Sequoia) | Apple Silicon (M1 / M2 / M3 / M4) | [⬇️ Download `.zip`](https://github.com/GhostOS-ai/Piktura/releases/latest/download/Piktura-macOS-AppleSilicon.zip) |
 
 ```bash
 # Quick run from terminal
@@ -91,6 +91,11 @@ python3 piktura_app.py
 Modern design tools have either drifted into bloated web subscription traps or over-simplified tablet interfaces that hide critical controls inside floating sheets. **Piktura Studio** brings back the golden age of desktop creativity:
 
 - **Photoshop Ergonomics:** The classic, battle-tested layout designers know by heart. A real Top Options Bar that updates with every tool, a 1-column/2-column dockable Left Toolbar, a multi-layer stack with blend modes, and a dedicated History panel.
+- **Layer Effects / Styles (`ƒx`):** Non-destructive Photoshop-grade Drop Shadow, Outer Glow, Stroke outline, and Color Overlay with live canvas preview, interactive modal controls, and seamless export composition.
+- **1-Click Smart Background Remover:** Intelligent border-seeded flood segmentation and alpha feathering that cleanly eliminates backgrounds into pure transparency in a single click.
+- **Creative Photo LUT Presets:** 8 instant cinematic color profiles (Cyberpunk Neon, Teal & Orange, Vintage 80s, Dramatic Noir, Golden Hour, Cold Nordic, HDR Vivid, Pastel Dream).
+- **Categorized New Document Presets:** 1-click canvas setups for Social Media (Instagram, YouTube, Telegram), Retina Screens (4K, MacBook Liquid Retina, iPhone 16 Pro), and Print (A4, A5, Business Card).
+- **Magnetic Snap Guides:** Drag guide lines from horizontal and vertical rulers with smart magnetic snapping to canvas center (50%), quarters (25%, 75%), and outer edges.
 - **In-Place Canvas Typography:** Click anywhere on the canvas to edit text directly with blinking caret and selection. Choose from **26+ built-in professional fonts**, adjust font size (`pt`), toggle **Bold (B)** and *Italic (I)*, set alignment (*Left, Center, Right*), and pick colors with the native macOS palette. Commit with `⌘ + Enter` or cancel with `Escape`.
 - **Live Canvas Feedback:** Marching ants for selections with real-time dimension tags, freeform dashed lasso trails, a Rule of Thirds crop box, a high-contrast circular brush ring with center dot, and an eyedropper loupe.
 - **Instant Launch & Ultra-Lightweight:** Launches in under 0.4 seconds on Apple Silicon. Idles at under 60 MB RAM. Zero background update daemons, zero telemetry, and 100% offline.
@@ -104,6 +109,11 @@ Modern design tools have either drifted into bloated web subscription traps or o
 Современные программы либо превратились в тяжеловесные «подписочные комбайны», либо спрятали профессиональные инструменты в неудобные выпадающие панели. **Piktura Studio** возвращает классическую эргономику Adobe Photoshop в сверхлёгком, быстром и нативном исполнении:
 
 - **Фотошоп-эргономика рабочего места:** Привычная рабочая среда, знакомая миллионам дизайнеров и фотографов. Настоящая верхняя панель параметров (Options Bar), переключаемый тулбар слева (1 или 2 колонки), стек слоёв с режимами наложения (Multiply, Screen, Overlay и др.) и история действий.
+- **Стили слоя (`ƒx`):** Полноценные недеструктивные стили слоя в стиле Photoshop: падающая тень (Drop Shadow), внешнее свечение (Outer Glow), контурная обводка (Stroke) и наложение цвета (Color Overlay) с живым предпросмотром на холсте и экспортом.
+- **Умное удаление фона в 1 клик:** Сегментация с кластеризацией цвета и альфа-сглаживанием контуров для мгновенного превращения однородного или градиентного фона в прозрачность.
+- **Художественные фото-пресеты (LUTs):** 8 авторских кинематографических цветовых профилей (Киберпанк, Teal & Orange, Ретро-пленка 80-х, Нуар ч/б, Золотой час, Северный холод, HDR Vivid, Пастельная мечта).
+- **Категории шаблонов нового холста:** Готовые пресеты для соцсетей (Instagram, YouTube, Telegram), экранов (4K, MacBook Liquid Retina, iPhone 16 Pro) и полиграфии (A4, A5, Визитка).
+- **Магнитные направляющие:** Вытягивание направляющих линий из линеек с автоматическим прилипанием к центру холста (50%), четвертям (25%, 75%) и границам.
 - **Интерактивный текст на холсте (In-Place Typography):** Кликните в любое место холста для прямого ввода текста с живым курсором и выделением. **26+ встроенных шрифтов** (Apple SF Pro, Helvetica Neue, Inter, Georgia, Futura, Baskerville, Menlo и др.), пошаговый размер в pt, кнопки **Жирный (B)** и *Курсив (I)*, выравнивание (*по левому краю, по центру, по правому краю*) и нативная палитра цветов macOS. Подтверждение по `⌘ + Enter`, отмена по `Escape`.
 - **Интерактивные визуальные индикаторы:** Анимированные «бегущие муравьи» с бейджем размеров ($W \times H$), пунктирный след лассо, рамка кадрирования с сеткой правила третей, высококонтрастный курсор-кольцо кисти и плавающая лупа пипетки.
 - **Мгновенный старт и легковесность:** Запуск менее чем за 0.4 секунды. Потребление памяти менее 60 МБ RAM. Никаких фоновых сервисов Creative Cloud, никакой телеметрии, 100% офлайн и без ежемесячных подписок.

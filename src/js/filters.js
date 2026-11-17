@@ -475,6 +475,108 @@ const Filters = {
       }
     }
     ctx.putImageData(dstData, 0, 0);
+  },
+
+  showPresetsDialog() {
+    const modal = document.getElementById("modal-presets");
+    if (modal) modal.classList.remove("hidden");
+  },
+
+  closePresetsDialog() {
+    const modal = document.getElementById("modal-presets");
+    if (modal) modal.classList.add("hidden");
+  },
+
+  applyPreset(name) {
+    const active = Layers.getActiveLayer();
+    if (!active || active.locked) {
+      alert("Please select an unlocked image layer.");
+      return;
+    }
+
+    const w = active.width;
+    const h = active.height;
+    const imgData = active.ctx.getImageData(0, 0, w, h);
+    const d = imgData.data;
+
+    for (let i = 0; i < d.length; i += 4) {
+      if (d[i + 3] === 0) continue;
+      let r = d[i], g = d[i + 1], b = d[i + 2];
+      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+
+      switch (name) {
+        case "cyberpunk": {
+          const t = lum / 255;
+          r = Math.min(255, r * 1.15 + (1 - t) * 15 + t * 40);
+          g = Math.min(255, g * 0.85 + (1 - t) * 35);
+          b = Math.min(255, b * 1.35 + (1 - t) * 60 + t * 30);
+          break;
+        }
+        case "tealOrange": {
+          if (lum > 128) {
+            r = Math.min(255, r * 1.20 + 15);
+            g = Math.min(255, g * 1.05 + 5);
+            b = Math.max(0, b * 0.85 - 10);
+          } else {
+            r = Math.max(0, r * 0.82 - 8);
+            g = Math.min(255, g * 1.08 + 12);
+            b = Math.min(255, b * 1.25 + 24);
+          }
+          break;
+        }
+        case "vintageFilm": {
+          r = Math.min(255, (r * 1.1) + 20);
+          g = Math.min(255, (g * 1.02) + 12);
+          b = Math.max(25, (b * 0.88) + 8);
+          r = 128 + (r - 128) * 0.9;
+          g = 128 + (g - 128) * 0.9;
+          b = 128 + (b - 128) * 0.9;
+          break;
+        }
+        case "dramaticNoir": {
+          const highCon = Math.max(0, Math.min(255, 128 + (lum - 128) * 1.45));
+          r = g = b = highCon;
+          break;
+        }
+        case "goldenHour": {
+          r = Math.min(255, r * 1.22 + 25);
+          g = Math.min(255, g * 1.08 + 12);
+          b = Math.max(0, b * 0.82 - 15);
+          break;
+        }
+        case "coldNordic": {
+          r = Math.max(0, r * 0.88 - 10);
+          g = Math.min(255, g * 1.02 + 6);
+          b = Math.min(255, b * 1.26 + 28);
+          break;
+        }
+        case "hdrVivid": {
+          const sat = 1.35;
+          r = Math.max(0, Math.min(255, lum + (r - lum) * sat));
+          g = Math.max(0, Math.min(255, lum + (g - lum) * sat));
+          b = Math.max(0, Math.min(255, lum + (b - lum) * sat));
+          r = Math.max(0, Math.min(255, 128 + (r - 128) * 1.15));
+          g = Math.max(0, Math.min(255, 128 + (g - 128) * 1.15));
+          b = Math.max(0, Math.min(255, 128 + (b - 128) * 1.15));
+          break;
+        }
+        case "pastelDream": {
+          r = Math.min(255, 140 + (r - 128) * 0.75 + 15);
+          g = Math.min(255, 135 + (g - 128) * 0.75 + 10);
+          b = Math.min(255, 145 + (b - 128) * 0.75 + 20);
+          break;
+        }
+      }
+
+      d[i] = Math.max(0, Math.min(255, Math.round(r)));
+      d[i + 1] = Math.max(0, Math.min(255, Math.round(g)));
+      d[i + 2] = Math.max(0, Math.min(255, Math.round(b)));
+    }
+
+    active.ctx.putImageData(imgData, 0, 0);
+    Layers.renderLayersPanel();
+    History.pushState(`Preset: ${name}`, null, "filter");
+    this.closePresetsDialog();
   }
 };
 
@@ -552,24 +654,148 @@ const Selection = {
 
   removeBackgroundAI() {
     const active = Layers.getActiveLayer();
-    if (!active) return;
-    this.selectSubjectAI();
-    if (this.activeBox) {
-      // Mask out exterior
-      const temp = document.createElement("canvas");
-      temp.width = this.activeBox.w;
-      temp.height = this.activeBox.h;
-      temp.getContext("2d").drawImage(
-        active.canvas,
-        this.activeBox.x, this.activeBox.y, this.activeBox.w, this.activeBox.h,
-        0, 0, this.activeBox.w, this.activeBox.h
-      );
-
-      active.clear();
-      active.ctx.drawImage(temp, this.activeBox.x, this.activeBox.y);
-      this.deselect();
-      Layers.renderLayersPanel();
-      History.pushState("AI Remove Background");
+    if (!active || active.locked) {
+      alert("Please select an unlocked image layer.");
+      return;
     }
+
+    const w = active.width;
+    const h = active.height;
+    const imgData = active.ctx.getImageData(0, 0, w, h);
+    const data = imgData.data;
+
+    // 1. Sample perimeter border pixels to determine background colors
+    const borderSamples = [];
+    const step = Math.max(1, Math.floor(Math.min(w, h) / 100));
+
+    // Top and bottom edges
+    for (let x = 0; x < w; x += step) {
+      let idxTop = x * 4;
+      if (data[idxTop + 3] > 10) borderSamples.push([data[idxTop], data[idxTop + 1], data[idxTop + 2]]);
+      let idxBot = ((h - 1) * w + x) * 4;
+      if (data[idxBot + 3] > 10) borderSamples.push([data[idxBot], data[idxBot + 1], data[idxBot + 2]]);
+    }
+    // Left and right edges
+    for (let y = 0; y < h; y += step) {
+      let idxLeft = (y * w) * 4;
+      if (data[idxLeft + 3] > 10) borderSamples.push([data[idxLeft], data[idxLeft + 1], data[idxLeft + 2]]);
+      let idxRight = (y * w + (w - 1)) * 4;
+      if (data[idxRight + 3] > 10) borderSamples.push([data[idxRight], data[idxRight + 1], data[idxRight + 2]]);
+    }
+
+    if (borderSamples.length === 0) return;
+
+    const visited = new Uint8Array(w * h);
+    const isBg = new Uint8Array(w * h);
+    const queue = new Int32Array(w * h);
+    let qHead = 0;
+    let qTail = 0;
+
+    const colorDist = (r1, g1, b1, r2, g2, b2) => {
+      const dr = r1 - r2;
+      const dg = g1 - g2;
+      const db = b1 - b2;
+      return Math.sqrt(dr * dr + dg * dg + db * db);
+    };
+
+    let avgR = 0, avgG = 0, avgB = 0;
+    borderSamples.forEach(([r, g, b]) => { avgR += r; avgG += g; avgB += b; });
+    avgR /= borderSamples.length;
+    avgG /= borderSamples.length;
+    avgB /= borderSamples.length;
+
+    const tolerance = 42;
+
+    // Initialize queue with border pixels matching background
+    for (let x = 0; x < w; x++) {
+      [0, h - 1].forEach(y => {
+        const p = y * w + x;
+        if (!visited[p]) {
+          visited[p] = 1;
+          const idx = p * 4;
+          if (data[idx + 3] <= 10 || colorDist(data[idx], data[idx + 1], data[idx + 2], avgR, avgG, avgB) < tolerance + 25) {
+            isBg[p] = 1;
+            queue[qTail++] = p;
+          }
+        }
+      });
+    }
+    for (let y = 0; y < h; y++) {
+      [0, w - 1].forEach(x => {
+        const p = y * w + x;
+        if (!visited[p]) {
+          visited[p] = 1;
+          const idx = p * 4;
+          if (data[idx + 3] <= 10 || colorDist(data[idx], data[idx + 1], data[idx + 2], avgR, avgG, avgB) < tolerance + 25) {
+            isBg[p] = 1;
+            queue[qTail++] = p;
+          }
+        }
+      });
+    }
+
+    // Breadth-First Flood Fill across matching background pixels
+    while (qHead < qTail) {
+      const curr = queue[qHead++];
+      const cx = curr % w;
+      const cy = Math.floor(curr / w);
+      const cIdx = curr * 4;
+      const cr = data[cIdx], cg = data[cIdx + 1], cb = data[cIdx + 2];
+
+      const neighbors = [
+        cx > 0 ? curr - 1 : -1,
+        cx < w - 1 ? curr + 1 : -1,
+        cy > 0 ? curr - w : -1,
+        cy < h - 1 ? curr + w : -1
+      ];
+
+      for (let i = 0; i < 4; i++) {
+        const np = neighbors[i];
+        if (np === -1 || visited[np]) continue;
+        visited[np] = 1;
+
+        const nIdx = np * 4;
+        if (data[nIdx + 3] <= 10) {
+          isBg[np] = 1;
+          queue[qTail++] = np;
+          continue;
+        }
+
+        const nr = data[nIdx], ng = data[nIdx + 1], nb = data[nIdx + 2];
+        const distFromAvg = colorDist(nr, ng, nb, avgR, avgG, avgB);
+        const distFromNeighbor = colorDist(nr, ng, nb, cr, cg, cb);
+
+        if (distFromAvg < tolerance || distFromNeighbor < 18) {
+          isBg[np] = 1;
+          queue[qTail++] = np;
+        }
+      }
+    }
+
+    // Feather edges & make background transparent
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const p = y * w + x;
+        const idx = p * 4;
+        if (isBg[p]) {
+          data[idx + 3] = 0;
+        } else {
+          let bgNeighborCount = 0;
+          if (x > 0 && isBg[p - 1]) bgNeighborCount++;
+          if (x < w - 1 && isBg[p + 1]) bgNeighborCount++;
+          if (y > 0 && isBg[p - w]) bgNeighborCount++;
+          if (y < h - 1 && isBg[p + w]) bgNeighborCount++;
+
+          if (bgNeighborCount > 0) {
+            data[idx + 3] = Math.max(0, Math.min(255, Math.round(data[idx + 3] * (1.0 - bgNeighborCount * 0.18))));
+          }
+        }
+      }
+    }
+
+    active.ctx.putImageData(imgData, 0, 0);
+    this.deselect();
+    Layers.renderLayersPanel();
+    History.pushState("action_remove_bg" || "Remove Background", null, "wand");
   }
 };

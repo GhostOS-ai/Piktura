@@ -2,7 +2,7 @@
  * Piktura Studio — Core Application Coordinator & Menus
  */
 const App = {
-  version: "1.1.6",
+  version: "1.2.0",
 
   init() {
     I18n.init();
@@ -232,11 +232,62 @@ const App = {
     if (modal) modal.classList.add("hidden");
   },
 
-  applyDocPreset(w, h) {
-    document.getElementById("new-doc-w").value = w;
-    document.getElementById("new-doc-h").value = h;
+  presetCategories: {
+    popular: [
+      { name: "Full HD (1920×1080)", w: 1920, h: 1080 },
+      { name: "Square Post (1080×1080)", w: 1080, h: 1080 },
+      { name: "Story / Reels / TikTok (1080×1920)", w: 1080, h: 1920 },
+      { name: "4K UHD (3840×2160)", w: 3840, h: 2160 },
+      { name: "A4 Print (2480×3508)", w: 2480, h: 3508 }
+    ],
+    social: [
+      { name: "Instagram Square (1080×1080)", w: 1080, h: 1080 },
+      { name: "Story / Reels / TikTok (1080×1920)", w: 1080, h: 1920 },
+      { name: "YouTube Video Thumbnail (1280×720)", w: 1280, h: 720 },
+      { name: "YouTube Channel Banner (2560×1440)", w: 2560, h: 1440 },
+      { name: "Telegram / VK Banner (1200×600)", w: 1200, h: 600 },
+      { name: "Twitter / X Header (1500×500)", w: 1500, h: 500 }
+    ],
+    screen: [
+      { name: "Full HD 1080p (1920×1080)", w: 1920, h: 1080 },
+      { name: "2K QHD (2560×1440)", w: 2560, h: 1440 },
+      { name: "4K UHD (3840×2160)", w: 3840, h: 2160 },
+      { name: "MacBook Pro Liquid Retina (3024×1964)", w: 3024, h: 1964 },
+      { name: "iPhone 16 Pro Wallpaper (1206×2622)", w: 1206, h: 2622 }
+    ],
+    print: [
+      { name: "A4 Document (2480×3508 @ 300 ppi)", w: 2480, h: 3508 },
+      { name: "A5 Flyer (1748×2480 @ 300 ppi)", w: 1748, h: 2480 },
+      { name: "Business Card (1050×600 @ 300 ppi)", w: 1050, h: 600 }
+    ]
+  },
+
+  showPresetCategory(catName) {
+    document.querySelectorAll(".cat-btn").forEach(b => {
+      b.classList.toggle("active", b.getAttribute("data-cat") === catName);
+    });
+    const container = document.getElementById("preset-chips-container");
+    if (!container) return;
+    const list = this.presetCategories[catName] || this.presetCategories.popular;
+    container.innerHTML = list.map((p, i) => `
+      <button class="preset-chip ${i === 0 ? 'active' : ''}" onclick="App.applyDocPreset(${p.w}, ${p.h}, this)">${p.name}</button>
+    `).join("");
+    if (list[0]) {
+      this.applyDocPreset(list[0].w, list[0].h);
+    }
+  },
+
+  applyDocPreset(w, h, btnEl = null) {
+    const inputW = document.getElementById("new-doc-w");
+    const inputH = document.getElementById("new-doc-h");
+    if (inputW) inputW.value = w;
+    if (inputH) inputH.value = h;
     document.querySelectorAll(".preset-chip").forEach(c => c.classList.remove("active"));
-    if (event && event.target) event.target.classList.add("active");
+    if (btnEl) {
+      btnEl.classList.add("active");
+    } else if (typeof event !== "undefined" && event && event.target && event.target.classList.contains("preset-chip")) {
+      event.target.classList.add("active");
+    }
   },
 
   confirmNewDocument() {
@@ -347,7 +398,11 @@ const App = {
         ctx.save();
         ctx.globalAlpha = l.opacity;
         ctx.globalCompositeOperation = l.blendMode === "normal" ? "source-over" : l.blendMode;
-        ctx.drawImage(l.canvas, Math.round(l.x || 0), Math.round(l.y || 0));
+        if (window.Effects && Effects.hasActiveEffects(l)) {
+          Effects.drawLayerWithEffects(ctx, l, Math.round(l.x || 0), Math.round(l.y || 0));
+        } else {
+          ctx.drawImage(l.canvas, Math.round(l.x || 0), Math.round(l.y || 0));
+        }
         ctx.restore();
       }
     });

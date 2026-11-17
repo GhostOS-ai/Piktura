@@ -89,6 +89,8 @@
             <div class="menu-entry" onclick="Layers.duplicateActiveLayer()"><span class="label" data-i18n="menu_duplicate_layer">Duplicate Layer...</span><span class="shortcut">⌘J</span></div>
             <div class="menu-entry" onclick="Layers.deleteActiveLayer()"><span class="label" data-i18n="menu_delete_layer">Delete Layer</span></div>
             <div class="menu-divider"></div>
+            <div class="menu-entry" onclick="Layers.showLayerEffectsDialog()"><span class="label" data-i18n="menu_layer_style">Layer Style (ƒx)...</span></div>
+            <div class="menu-divider"></div>
             <div class="menu-entry" onclick="Layers.mergeDown()"><span class="label" data-i18n="menu_merge_down">Merge Down</span><span class="shortcut">⌘E</span></div>
             <div class="menu-entry" onclick="Layers.mergeVisible()"><span class="label" data-i18n="menu_merge_visible">Merge Visible</span><span class="shortcut">⇧⌘E</span></div>
             <div class="menu-entry" onclick="Layers.flattenImage()"><span class="label" data-i18n="menu_flatten">Flatten Image</span></div>
@@ -110,6 +112,8 @@
         <div class="menu-item" data-menu="filter">
           <span data-i18n="menu_filter">Filter</span>
           <div class="menu-dropdown">
+            <div class="menu-entry" onclick="Filters.showPresetsDialog()"><span class="label" data-i18n="menu_creative_presets">🎨 Creative Presets (LUTs)...</span></div>
+            <div class="menu-divider"></div>
             <div class="menu-entry" onclick="Filters.gaussianBlur(8)"><span class="label" data-i18n="menu_gaussian_blur">Gaussian Blur...</span></div>
             <div class="menu-entry" onclick="Filters.motionBlur(12, 0)"><span class="label" data-i18n="menu_motion_blur">Motion Blur...</span></div>
             <div class="menu-divider"></div>
@@ -511,12 +515,18 @@
         <button class="modal-close-btn" onclick="App.closeNewDocumentDialog()">✕</button>
       </div>
       <div class="modal-body">
-        <div class="preset-chips">
-          <button class="preset-chip active" onclick="App.applyDocPreset(1920, 1080)">Full HD (1920×1080)</button>
-          <button class="preset-chip" onclick="App.applyDocPreset(3840, 2160)">4K UHD (3840×2160)</button>
-          <button class="preset-chip" onclick="App.applyDocPreset(1080, 1080)">Square Post (1080×1080)</button>
-          <button class="preset-chip" onclick="App.applyDocPreset(1080, 1920)">Story / Reel (1080×1920)</button>
-          <button class="preset-chip" onclick="App.applyDocPreset(2480, 3508)">A4 Print (300 ppi)</button>
+        <div class="preset-category-bar">
+          <button class="cat-btn active" data-cat="popular" onclick="App.showPresetCategory('popular')">🔥 Popular</button>
+          <button class="cat-btn" data-cat="social" onclick="App.showPresetCategory('social')">📱 Social Media</button>
+          <button class="cat-btn" data-cat="screen" onclick="App.showPresetCategory('screen')">🖥️ Screen</button>
+          <button class="cat-btn" data-cat="print" onclick="App.showPresetCategory('print')">🖨️ Print</button>
+        </div>
+        <div class="preset-chips" id="preset-chips-container">
+          <button class="preset-chip active" onclick="App.applyDocPreset(1920, 1080, this)">Full HD (1920×1080)</button>
+          <button class="preset-chip" onclick="App.applyDocPreset(1080, 1080, this)">Square Post (1080×1080)</button>
+          <button class="preset-chip" onclick="App.applyDocPreset(1080, 1920, this)">Story / Reel / TikTok (1080×1920)</button>
+          <button class="preset-chip" onclick="App.applyDocPreset(3840, 2160, this)">4K UHD (3840×2160)</button>
+          <button class="preset-chip" onclick="App.applyDocPreset(2480, 3508, this)">A4 Print (300 ppi)</button>
         </div>
         <div class="modal-form-grid">
           <div class="form-group">
@@ -683,6 +693,206 @@
     </div>
   </div>
 
+  <!-- ==================== LAYER EFFECTS (FX) MODAL ==================== -->
+  <div id="modal-layer-effects" class="ps-modal hidden">
+    <div class="modal-backdrop" onclick="Effects.cancel()"></div>
+    <div class="modal-window fx-modal-window" style="width: 620px;">
+      <div class="modal-header">
+        <h3 id="fx-modal-title">Layer Style (ƒx)</h3>
+        <button class="modal-close-btn" onclick="Effects.cancel()">✕</button>
+      </div>
+      <div class="modal-body fx-modal-body" style="padding: 0; display: flex; height: 380px;">
+        <div class="fx-sidebar">
+          <div class="fx-nav-item active" data-tab="shadow" onclick="Effects.selectTab('shadow')">
+            <input type="checkbox" id="fx-shadow-enable" onchange="Effects.updateFromInputs(); event.stopPropagation();">
+            <span>Drop Shadow</span>
+          </div>
+          <div class="fx-nav-item" data-tab="glow" onclick="Effects.selectTab('glow')">
+            <input type="checkbox" id="fx-glow-enable" onchange="Effects.updateFromInputs(); event.stopPropagation();">
+            <span>Outer Glow</span>
+          </div>
+          <div class="fx-nav-item" data-tab="stroke" onclick="Effects.selectTab('stroke')">
+            <input type="checkbox" id="fx-stroke-enable" onchange="Effects.updateFromInputs(); event.stopPropagation();">
+            <span>Stroke</span>
+          </div>
+          <div class="fx-nav-item" data-tab="overlay" onclick="Effects.selectTab('overlay')">
+            <input type="checkbox" id="fx-overlay-enable" onchange="Effects.updateFromInputs(); event.stopPropagation();">
+            <span>Color Overlay</span>
+          </div>
+        </div>
+
+        <div class="fx-content">
+          <!-- Drop Shadow Pane -->
+          <div class="fx-tab-pane active" id="fx-pane-shadow">
+            <h4 class="fx-pane-title">Drop Shadow Structure</h4>
+            <div class="form-group">
+              <label>Color & Opacity:</label>
+              <div class="fx-color-row">
+                <input type="color" id="fx-shadow-color" class="fx-color-input" onchange="Effects.setValue('fx-shadow-color-text', this.value); Effects.updateFromInputs();">
+                <input type="text" id="fx-shadow-color-text" class="ps-input" style="width: 80px;" onchange="Effects.setValue('fx-shadow-color', this.value); Effects.updateFromInputs();">
+                <input type="range" id="fx-shadow-opacity" min="0" max="100" value="75" class="ps-range" style="flex:1" oninput="Effects.setRange('fx-shadow-opacity', this.value, 'fx-shadow-opacity-val', '%'); Effects.updateFromInputs();">
+                <span id="fx-shadow-opacity-val" class="fx-val-badge">75%</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Angle:</label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="range" id="fx-shadow-angle" min="0" max="360" value="120" class="ps-range" style="flex:1" oninput="Effects.setRange('fx-shadow-angle', this.value, 'fx-shadow-angle-val', '°'); Effects.updateFromInputs();">
+                <span id="fx-shadow-angle-val" class="fx-val-badge">120°</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Distance:</label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="range" id="fx-shadow-dist" min="0" max="80" value="10" class="ps-range" style="flex:1" oninput="Effects.setRange('fx-shadow-dist', this.value, 'fx-shadow-dist-val', ' px'); Effects.updateFromInputs();">
+                <span id="fx-shadow-dist-val" class="fx-val-badge">10 px</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Blur (Size):</label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="range" id="fx-shadow-blur" min="0" max="60" value="14" class="ps-range" style="flex:1" oninput="Effects.setRange('fx-shadow-blur', this.value, 'fx-shadow-blur-val', ' px'); Effects.updateFromInputs();">
+                <span id="fx-shadow-blur-val" class="fx-val-badge">14 px</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Outer Glow Pane -->
+          <div class="fx-tab-pane" id="fx-pane-glow">
+            <h4 class="fx-pane-title">Outer Glow Structure</h4>
+            <div class="form-group">
+              <label>Glow Color & Opacity:</label>
+              <div class="fx-color-row">
+                <input type="color" id="fx-glow-color" class="fx-color-input" onchange="Effects.setValue('fx-glow-color-text', this.value); Effects.updateFromInputs();">
+                <input type="text" id="fx-glow-color-text" class="ps-input" style="width: 80px;" onchange="Effects.setValue('fx-glow-color', this.value); Effects.updateFromInputs();">
+                <input type="range" id="fx-glow-opacity" min="0" max="100" value="85" class="ps-range" style="flex:1" oninput="Effects.setRange('fx-glow-opacity', this.value, 'fx-glow-opacity-val', '%'); Effects.updateFromInputs();">
+                <span id="fx-glow-opacity-val" class="fx-val-badge">85%</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Glow Radius (Blur):</label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="range" id="fx-glow-blur" min="0" max="80" value="20" class="ps-range" style="flex:1" oninput="Effects.setRange('fx-glow-blur', this.value, 'fx-glow-blur-val', ' px'); Effects.updateFromInputs();">
+                <span id="fx-glow-blur-val" class="fx-val-badge">20 px</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stroke Pane -->
+          <div class="fx-tab-pane" id="fx-pane-stroke">
+            <h4 class="fx-pane-title">Stroke Outline Structure</h4>
+            <div class="form-group">
+              <label>Stroke Size:</label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="range" id="fx-stroke-size" min="1" max="30" value="3" class="ps-range" style="flex:1" oninput="Effects.setRange('fx-stroke-size', this.value, 'fx-stroke-size-val', ' px'); Effects.updateFromInputs();">
+                <span id="fx-stroke-size-val" class="fx-val-badge">3 px</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Color & Opacity:</label>
+              <div class="fx-color-row">
+                <input type="color" id="fx-stroke-color" class="fx-color-input" onchange="Effects.setValue('fx-stroke-color-text', this.value); Effects.updateFromInputs();">
+                <input type="text" id="fx-stroke-color-text" class="ps-input" style="width: 80px;" onchange="Effects.setValue('fx-stroke-color', this.value); Effects.updateFromInputs();">
+                <input type="range" id="fx-stroke-opacity" min="0" max="100" value="100" class="ps-range" style="flex:1" oninput="Effects.setRange('fx-stroke-opacity', this.value, 'fx-stroke-opacity-val', '%'); Effects.updateFromInputs();">
+                <span id="fx-stroke-opacity-val" class="fx-val-badge">100%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Color Overlay Pane -->
+          <div class="fx-tab-pane" id="fx-pane-overlay">
+            <h4 class="fx-pane-title">Color Overlay</h4>
+            <div class="form-group">
+              <label>Overlay Color:</label>
+              <div class="fx-color-row">
+                <input type="color" id="fx-overlay-color" class="fx-color-input" onchange="Effects.setValue('fx-overlay-color-text', this.value); Effects.updateFromInputs();">
+                <input type="text" id="fx-overlay-color-text" class="ps-input" style="width: 80px;" onchange="Effects.setValue('fx-overlay-color', this.value); Effects.updateFromInputs();">
+                <input type="range" id="fx-overlay-opacity" min="0" max="100" value="50" class="ps-range" style="flex:1" oninput="Effects.setRange('fx-overlay-opacity', this.value, 'fx-overlay-opacity-val', '%'); Effects.updateFromInputs();">
+                <span id="fx-overlay-opacity-val" class="fx-val-badge">50%</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Blend Mode:</label>
+              <select id="fx-overlay-blend" class="ps-select" onchange="Effects.updateFromInputs()">
+                <option value="source-atop">Normal Tint</option>
+                <option value="multiply">Multiply</option>
+                <option value="screen">Screen</option>
+                <option value="overlay">Overlay</option>
+                <option value="soft-light">Soft Light</option>
+                <option value="color">Color</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; padding:12px 20px;">
+        <button class="ps-btn" onclick="Effects.cancel()">Cancel</button>
+        <button class="ps-btn primary" onclick="Effects.commit()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== CREATIVE PHOTO PRESETS (LUTS) MODAL ==================== -->
+  <div id="modal-presets" class="ps-modal hidden">
+    <div class="modal-backdrop" onclick="Filters.closePresetsDialog()"></div>
+    <div class="modal-window" style="width: 580px;">
+      <div class="modal-header">
+        <h3>🎨 Creative Photo Presets (1-Click Color Grading)</h3>
+        <button class="modal-close-btn" onclick="Filters.closePresetsDialog()">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 20px;">
+        <p style="color:var(--ps-text-dim); font-size:12px; margin-bottom:16px;">
+          Choose a cinematic color grading LUT to instantly transform the active image layer:
+        </p>
+        <div class="preset-grid">
+          <div class="preset-card" onclick="Filters.applyPreset('cyberpunk')">
+            <div class="preset-card-preview" style="background: linear-gradient(135deg, #00f2fe, #4facfe, #fa709a, #fee140);"></div>
+            <div class="preset-card-name">🌆 Cyberpunk Neon</div>
+            <div class="preset-card-desc">Vibrant cyan shadows & magenta neon</div>
+          </div>
+          <div class="preset-card" onclick="Filters.applyPreset('tealOrange')">
+            <div class="preset-card-preview" style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364, #f39c12);"></div>
+            <div class="preset-card-name">🎬 Teal & Orange</div>
+            <div class="preset-card-desc">Hollywood cinema blockbuster look</div>
+          </div>
+          <div class="preset-card" onclick="Filters.applyPreset('vintageFilm')">
+            <div class="preset-card-preview" style="background: linear-gradient(135deg, #fce38a, #f38181, #594d46);"></div>
+            <div class="preset-card-name">🎞️ Vintage Film 80s</div>
+            <div class="preset-card-desc">Analog warmth & faded matte shadows</div>
+          </div>
+          <div class="preset-card" onclick="Filters.applyPreset('dramaticNoir')">
+            <div class="preset-card-preview" style="background: linear-gradient(135deg, #000000, #434343, #ffffff);"></div>
+            <div class="preset-card-name">🖤 Dramatic Noir B&W</div>
+            <div class="preset-card-desc">Deep high-contrast silver tones</div>
+          </div>
+          <div class="preset-card" onclick="Filters.applyPreset('goldenHour')">
+            <div class="preset-card-preview" style="background: linear-gradient(135deg, #f7971e, #ffd200, #ff6e7f);"></div>
+            <div class="preset-card-name">🌅 Golden Hour</div>
+            <div class="preset-card-desc">Warm glowing sunlight & rich amber</div>
+          </div>
+          <div class="preset-card" onclick="Filters.applyPreset('coldNordic')">
+            <div class="preset-card-preview" style="background: linear-gradient(135deg, #2c3e50, #3498db, #ecf0f1);"></div>
+            <div class="preset-card-name">❄️ Cold Nordic</div>
+            <div class="preset-card-desc">Icy blues & crisp clean highlights</div>
+          </div>
+          <div class="preset-card" onclick="Filters.applyPreset('hdrVivid')">
+            <div class="preset-card-preview" style="background: linear-gradient(135deg, #ff0844, #ffb199, #00c6ff);"></div>
+            <div class="preset-card-name">⚡ HDR Ultra Vivid</div>
+            <div class="preset-card-desc">Maximum punch, clarity & saturation</div>
+          </div>
+          <div class="preset-card" onclick="Filters.applyPreset('pastelDream')">
+            <div class="preset-card-preview" style="background: linear-gradient(135deg, #a8edea, #fed6e3, #d299c2);"></div>
+            <div class="preset-card-name">🌸 Pastel Dream</div>
+            <div class="preset-card-desc">Aesthetic soft luminosity & pastels</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="ps-btn" onclick="Filters.closePresetsDialog()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== ABOUT & BRAND DASHBOARD MODAL ==================== -->
   <div id="modal-about" class="ps-modal hidden">
     <div class="modal-backdrop" onclick="App.closeAboutModal()"></div>
@@ -694,7 +904,7 @@
       <div class="modal-body" style="text-align: center; padding: 26px 20px 20px;">
         <img src="assets/icon.png" class="about-logo-big" alt="Piktura Studio">
         <h2 class="about-app-title">Piktura Studio</h2>
-        <div class="about-version-badge">v1.1.6 • Apple Silicon Native</div>
+        <div class="about-version-badge">v1.2.0 • Apple Silicon Native</div>
         <p class="about-tagline-text" data-i18n="about_tagline">Next-Gen Professional Creative Suite</p>
         <div class="about-pills">
           <span class="about-pill">⚡ Metal GPU</span>
@@ -729,6 +939,7 @@
   <script src="js/i18n.js"></script>
   <script src="js/color.js"></script>
   <script src="js/history.js"></script>
+  <script src="js/effects.js"></script>
   <script src="js/layer.js"></script>
   <script src="js/canvas.js"></script>
   <script src="js/tools.js"></script>

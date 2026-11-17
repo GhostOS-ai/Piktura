@@ -20,6 +20,9 @@ class Layer {
     this.x = 0;
     this.y = 0;
 
+    // Layer Styles & Effects (fx)
+    this.effects = window.Effects ? Effects.defaultEffects() : null;
+
     // The offscreen render canvas for this layer's pixel content
     this.canvas = document.createElement("canvas");
     this.canvas.width = width;
@@ -62,6 +65,7 @@ class Layer {
     copy.textData = this.textData ? JSON.parse(JSON.stringify(this.textData)) : null;
     copy.x = this.x;
     copy.y = this.y;
+    copy.effects = this.effects ? JSON.parse(JSON.stringify(this.effects)) : (window.Effects ? Effects.defaultEffects() : null);
     copy.ctx.drawImage(this.canvas, 0, 0);
     return copy;
   }
@@ -108,6 +112,9 @@ const Layers = {
       layer.canvas.style.mixBlendMode = layer.blendMode;
       layer.canvas.style.display = layer.visible ? "block" : "none";
       layer.canvas.style.transform = `translate(${Math.round(layer.x || 0)}px, ${Math.round(layer.y || 0)}px)`;
+      if (window.Effects) {
+        Effects.applyToLayer(layer);
+      }
       container.appendChild(layer.canvas);
     });
   },
@@ -277,6 +284,14 @@ const Layers = {
     return null;
   },
 
+  showLayerEffectsDialog(index = null) {
+    if (index !== null) this.setActiveLayer(index);
+    const active = this.getActiveLayer();
+    if (active && window.Effects) {
+      Effects.showDialog(active);
+    }
+  },
+
   editLayerText(index) {
     if (index >= 0 && index < this.layers.length) {
       const layer = this.layers[index];
@@ -303,6 +318,7 @@ const Layers = {
       const eyeClass = layer.visible ? "" : "hidden";
       const lockIcon = layer.isBackground ? "🔒" : "";
       const isText = layer.isTextLayer && layer.textData;
+      const hasFx = window.Effects && Effects.hasActiveEffects(layer);
 
       const thumbContent = isText
         ? `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#1b2234; border-radius:2px;"><span style="font-weight:900; font-family:serif; font-size:16px; color:#60a5fa;">T</span></div>`
@@ -328,7 +344,10 @@ const Layers = {
               <span>${Math.round(layer.opacity * 100)}%</span>
             </div>
           </div>
-          ${lockIcon ? `<span class="layer-lock-icon">${lockIcon}</span>` : ""}
+          <div class="layer-actions-quick">
+            <button class="layer-fx-chip ${hasFx ? 'has-fx' : ''}" onclick="event.stopPropagation(); Layers.showLayerEffectsDialog(${index})" title="Layer Styles (fx)">ƒx</button>
+            ${lockIcon ? `<span class="layer-lock-icon">${lockIcon}</span>` : ""}
+          </div>
         </div>
       `;
     }).join("");
@@ -363,6 +382,7 @@ const Layers = {
       visible: layer.visible,
       x: layer.x || 0,
       y: layer.y || 0,
+      effects: layer.effects ? JSON.parse(JSON.stringify(layer.effects)) : null,
       isTextLayer: !!layer.isTextLayer,
       textData: layer.textData ? JSON.parse(JSON.stringify(layer.textData)) : null,
       dataUrl: layer.canvas.toDataURL("image/png")
@@ -382,6 +402,7 @@ const Layers = {
       layer.visible = item.visible;
       layer.x = item.x || 0;
       layer.y = item.y || 0;
+      layer.effects = item.effects || (window.Effects ? Effects.defaultEffects() : null);
       layer.isTextLayer = !!item.isTextLayer;
       layer.textData = item.textData || null;
 
@@ -392,6 +413,9 @@ const Layers = {
         layer.canvas.style.mixBlendMode = layer.blendMode;
         layer.canvas.style.display = layer.visible ? "block" : "none";
         layer.canvas.style.transform = `translate(${Math.round(layer.x)}px, ${Math.round(layer.y)}px)`;
+        if (window.Effects) {
+          Effects.applyToLayer(layer);
+        }
         this.renderLayersPanel();
       };
       img.src = item.dataUrl;

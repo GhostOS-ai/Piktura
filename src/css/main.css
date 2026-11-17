@@ -652,3 +652,231 @@ html, body {
   font-weight: 600;
   color: #ffffff;
 }
+
+/* ==========================================================================
+   v1.2.0: Layer Effects (fx), Creative LUT Presets, Guides & Categories
+   ========================================================================== */
+
+/* Layer Effects Modal Styles */
+.fx-sidebar {
+  width: 175px;
+  background: #171922;
+  border-right: 1px solid var(--ps-border-subtle);
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.fx-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  font-size: 12px;
+  color: var(--ps-text-main);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+}
+
+.fx-nav-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.fx-nav-item.active {
+  background: #232735;
+  color: #fff;
+  border-left-color: var(--ps-accent-bright);
+  font-weight: 600;
+}
+
+.fx-nav-item input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: var(--ps-accent-bright);
+}
+
+.fx-content {
+  flex: 1;
+  padding: 18px 24px;
+  background: var(--ps-bg-darkest);
+  overflow-y: auto;
+}
+
+.fx-tab-pane {
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.fx-tab-pane.active {
+  display: flex;
+}
+
+.fx-pane-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 4px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--ps-border-subtle);
+}
+
+.fx-color-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fx-color-input {
+  width: 32px;
+  height: 26px;
+  border: 1px solid var(--ps-border-subtle);
+  border-radius: 4px;
+  padding: 0;
+  cursor: pointer;
+  background: none;
+}
+
+.fx-val-badge {
+  font-size: 11px;
+  color: var(--ps-accent-bright);
+  font-family: var(--ps-font-mono);
+  min-width: 48px;
+  text-align: right;
+}
+
+/* Layer Row fx Chip */
+.layer-actions-quick {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.layer-fx-chip {
+  padding: 1px 5px;
+  font-size: 10px;
+  font-weight: 700;
+  font-style: italic;
+  font-family: serif;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ps-text-dim);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.layer-fx-chip:hover {
+  background: rgba(59, 130, 246, 0.2);
+  color: var(--ps-accent-bright);
+  border-color: var(--ps-accent-bright);
+}
+
+.layer-fx-chip.has-fx {
+  background: var(--ps-accent-bright);
+  color: #fff;
+  border-color: var(--ps-accent-bright);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+}
+
+/* Creative Presets Modal Grid */
+.preset-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.preset-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--ps-bg-medium);
+  border: 1px solid var(--ps-border-subtle);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.preset-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--ps-accent-bright);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.preset-card-preview {
+  height: 48px;
+  width: 100%;
+}
+
+.preset-card-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  padding: 8px 10px 2px;
+}
+
+.preset-card-desc {
+  font-size: 10.5px;
+  color: var(--ps-text-dim);
+  padding: 0 10px 8px;
+}
+
+/* Preset Category Tabs in New Doc */
+.preset-category-bar {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--ps-border-subtle);
+  padding-bottom: 8px;
+  margin-bottom: 6px;
+}
+
+.cat-btn {
+  background: none;
+  border: none;
+  color: var(--ps-text-dim);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.cat-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.cat-btn.active {
+  background: var(--ps-accent-bright);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Cyan Photoshop Magnetic Guide Lines */
+.canvas-guide {
+  position: absolute;
+  pointer-events: none;
+  z-index: 80;
+}
+
+.canvas-guide.horizontal {
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #00e5ff;
+  box-shadow: 0 0 3px rgba(0, 229, 255, 0.6);
+}
+
+.canvas-guide.vertical {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #00e5ff;
+  box-shadow: 0 0 3px rgba(0, 229, 255, 0.6);
+}

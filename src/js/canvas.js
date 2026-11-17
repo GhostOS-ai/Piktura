@@ -111,7 +111,20 @@ const Canvas = {
 
     const onMove = (me) => {
       const c = this.getCanvasCoords(me);
-      guide.pos = Math.round(type === "h" ? c.y : c.x);
+      let p = Math.round(type === "h" ? c.y : c.x);
+      const maxDim = type === "h" ? Layers.docHeight : Layers.docWidth;
+      const snapThreshold = 14 / (this.zoom || 1.0);
+
+      // Magnetic Snapping to Center (50%), Quarters (25%, 75%), and Edges (0, 100%)
+      const snapPoints = [0, Math.round(maxDim * 0.25), Math.round(maxDim * 0.5), Math.round(maxDim * 0.75), maxDim];
+      for (const sp of snapPoints) {
+        if (Math.abs(p - sp) < snapThreshold) {
+          p = sp;
+          break;
+        }
+      }
+
+      guide.pos = p;
       this.renderGuides();
     };
 
