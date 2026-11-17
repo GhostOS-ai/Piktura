@@ -71,23 +71,72 @@ const Documents = {
     const doc = new PikturaDoc(title, width, height, bg);
 
     // Initialize layers for this document
-    const bgLayer = new Layer("Background", width, height, bg === "white");
+    const LayerClass = window.Layer || Layer;
+    const bgLayer = new LayerClass("Background", width, height, bg === "white");
     if (bg === "black") {
       bgLayer.ctx.fillStyle = "#000000";
       bgLayer.ctx.fillRect(0, 0, width, height);
     } else if (bg === "transparent") {
       bgLayer.clear();
     }
-    const layer1 = new Layer("Layer 1", width, height);
+    const layer1 = new LayerClass("Layer 1", width, height);
 
     doc.layers = [bgLayer, layer1];
     doc.activeLayerIndex = 1;
+
+    // Snapshot pristine initial document state for 100% instant undo / delete state
+    const bgClone = document.createElement("canvas");
+    bgClone.width = width;
+    bgClone.height = height;
+    bgClone.getContext("2d").drawImage(bgLayer.canvas, 0, 0);
+
+    const l1Clone = document.createElement("canvas");
+    l1Clone.width = width;
+    l1Clone.height = height;
+    l1Clone.getContext("2d").drawImage(layer1.canvas, 0, 0);
+
     doc.historyStack = [{
-      nameOrKey: "action_new_doc" || "New Document",
-      name: (window.I18n && I18n.t("menu_new")) || "New Document",
+      nameOrKey: "new_document",
+      name: (window.I18n && I18n.t("new_document")) || "New Document",
       toolId: "document",
       details: `${width}×${height}`,
-      snapshot: null,
+      snapshot: {
+        activeLayerIndex: 1,
+        layers: [
+          {
+            id: bgLayer.id,
+            name: bgLayer.name,
+            opacity: bgLayer.opacity,
+            blendMode: bgLayer.blendMode,
+            visible: bgLayer.visible,
+            locked: !!bgLayer.locked,
+            isBackground: true,
+            x: 0,
+            y: 0,
+            effects: null,
+            isTextLayer: false,
+            textData: null,
+            canvasClone: bgClone,
+            dataUrl: bgLayer.canvas.toDataURL("image/png")
+          },
+          {
+            id: layer1.id,
+            name: layer1.name,
+            opacity: layer1.opacity,
+            blendMode: layer1.blendMode,
+            visible: layer1.visible,
+            locked: false,
+            isBackground: false,
+            x: 0,
+            y: 0,
+            effects: null,
+            isTextLayer: false,
+            textData: null,
+            canvasClone: l1Clone,
+            dataUrl: layer1.canvas.toDataURL("image/png")
+          }
+        ]
+      },
       timestamp: Date.now()
     }];
     doc.historyIndex = 0;
@@ -128,18 +177,46 @@ const Documents = {
     }
 
     const doc = new PikturaDoc(title, w, h, "transparent");
-    const bgLayer = new Layer("Background", w, h, false);
+    const LayerClass = window.Layer || Layer;
+    const bgLayer = new LayerClass("Background", w, h, false);
     bgLayer.clear();
     bgLayer.ctx.drawImage(img, 0, 0);
 
     doc.layers = [bgLayer];
     doc.activeLayerIndex = 0;
+
+    // Snapshot pristine loaded image state for instant 100% undo / delete state
+    const bgClone = document.createElement("canvas");
+    bgClone.width = w;
+    bgClone.height = h;
+    bgClone.getContext("2d").drawImage(bgLayer.canvas, 0, 0);
+
     doc.historyStack = [{
       nameOrKey: `Open ${title}`,
       name: (window.I18n ? I18n.t("menu_open") : "Open") + ` ${title}`,
       toolId: "document",
       details: `${w}×${h}`,
-      snapshot: null,
+      snapshot: {
+        activeLayerIndex: 0,
+        layers: [
+          {
+            id: bgLayer.id,
+            name: bgLayer.name,
+            opacity: bgLayer.opacity,
+            blendMode: bgLayer.blendMode,
+            visible: bgLayer.visible,
+            locked: false,
+            isBackground: false,
+            x: 0,
+            y: 0,
+            effects: null,
+            isTextLayer: false,
+            textData: null,
+            canvasClone: bgClone,
+            dataUrl: bgLayer.canvas.toDataURL("image/png")
+          }
+        ]
+      },
       timestamp: Date.now()
     }];
     doc.historyIndex = 0;
@@ -367,3 +444,5 @@ const Documents = {
       .replace(/'/g, "&#39;");
   }
 };
+
+window.Documents = Documents;

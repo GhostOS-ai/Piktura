@@ -128,12 +128,40 @@ const History = {
     }
   },
 
-  clearHistory() {
-    if (this.stack.length <= 1) return;
-    const currentState = this.stack[this.currentIndex];
-    this.stack = [currentState];
+  revertToOriginal() {
+    if (this.stack.length === 0) return;
+    this.goToState(0);
+    this.stack = [this.stack[0]];
     this.currentIndex = 0;
     this.renderHistoryPanel();
+    if (window.Documents) {
+      const doc = Documents.getActiveDoc();
+      if (doc) {
+        doc.isDirty = false;
+        doc.savedHistoryIndex = 0;
+        Documents.renderTabs();
+      }
+    }
+  },
+
+  clearHistory() {
+    if (this.stack.length <= 1) return;
+    const isRu = window.I18n && I18n.currentLang === "ru";
+    const isKk = window.I18n && I18n.currentLang === "kk";
+    const msg = isRu
+      ? "Вернуть документ к исходному состоянию (Сбросить изменения)?\n\nНажмите «ОК», чтобы вернуть к исходному, или «Отмена», чтобы оставить текущий вид."
+      : isKk
+      ? "Құжатты бастапқы күйіне қайтару керек пе?\n\nБастапқы күйге оралу үшін «ОК», қазіргі көріністі қалдыру үшін «Болдырмау» басыңыз."
+      : "Revert document back to original state (discard edits)?\n\nClick OK to revert to original, or Cancel to keep current state.";
+
+    if (confirm(msg)) {
+      this.revertToOriginal();
+    } else {
+      const currentState = this.stack[this.currentIndex];
+      this.stack = [currentState];
+      this.currentIndex = 0;
+      this.renderHistoryPanel();
+    }
   },
 
   getToolIconSvg(toolId) {
@@ -194,3 +222,5 @@ const History = {
     }
   }
 };
+
+window.History = History;

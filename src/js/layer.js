@@ -378,54 +378,103 @@ const Layers = {
   },
 
   serialize() {
-    return this.layers.map(layer => ({
-      name: layer.name,
-      opacity: layer.opacity,
-      blendMode: layer.blendMode,
-      visible: layer.visible,
-      x: layer.x || 0,
-      y: layer.y || 0,
-      effects: layer.effects ? JSON.parse(JSON.stringify(layer.effects)) : null,
-      isTextLayer: !!layer.isTextLayer,
-      textData: layer.textData ? JSON.parse(JSON.stringify(layer.textData)) : null,
-      dataUrl: layer.canvas.toDataURL("image/png")
-    }));
+    return {
+      activeLayerIndex: this.activeLayerIndex,
+      layers: this.layers.map(layer => {
+        // Fast synchronous canvas clone for instant 0ms state restoration
+        const cvsClone = document.createElement("canvas");
+        cvsClone.width = layer.canvas.width;
+        cvsClone.height = layer.canvas.height;
+        cvsClone.getContext("2d").drawImage(layer.canvas, 0, 0);
+
+        return {
+          id: layer.id,
+          name: layer.name,
+          opacity: layer.opacity,
+          blendMode: layer.blendMode,
+          visible: layer.visible,
+          locked: !!layer.locked,
+          isBackground: !!layer.isBackground,
+          x: layer.x || 0,
+          y: layer.y || 0,
+          effects: layer.effects ? JSON.parse(JSON.stringify(layer.effects)) : null,
+          isTextLayer: !!layer.isTextLayer,
+          textData: layer.textData ? JSON.parse(JSON.stringify(layer.textData)) : null,
+          canvasClone: cvsClone,
+          dataUrl: layer.canvas.toDataURL("image/png")
+        };
+      })
+    };
   },
 
   deserialize(data) {
-    if (!data || !Array.isArray(data)) return;
+    if (!data) return;
+    const items = Array.isArray(data) ? data : (data.layers || []);
+    if (!Array.isArray(items) || items.length === 0) return;
+
     this.layers = [];
     const container = document.getElementById("layers-container");
     if (container) container.innerHTML = "";
 
-    data.forEach((item, idx) => {
-      const layer = new Layer(item.name, this.docWidth, this.docHeight, idx === 0 && item.name === "Background");
-      layer.opacity = item.opacity;
-      layer.blendMode = item.blendMode;
-      layer.visible = item.visible;
+    items.forEach((item, idx) => {
+      const isBg = item.isBackground !== undefined ? item.isBackground : (idx === 0 && item.name === "Background");
+      const layer = new Layer(item.name, this.docWidth, this.docHeight, false);
+      layer.id = item.id || layer.id;
+      layer.opacity = item.opacity !== undefined ? item.opacity : 1.0;
+      layer.blendMode = item.blendMode || "normal";
+      layer.visible = item.visible !== undefined ? item.visible : true;
+      layer.locked = !!item.locked;
+      layer.isBackground = isBg;
       layer.x = item.x || 0;
       layer.y = item.y || 0;
-      layer.effects = item.effects || (window.Effects ? Effects.defaultEffects() : null);
+      layer.effects = item.effects ? JSON.parse(JSON.stringify(item.effects)) : (window.Effects ? Effects.defaultEffects() : null);
       layer.isTextLayer = !!item.isTextLayer;
-      layer.textData = item.textData || null;
+      layer.textData = item.textData ? JSON.parse(JSON.stringify(item.textData)) : null;
 
-      const img = new Image();
-      img.onload = () => {
-        layer.ctx.drawImage(img, 0, 0);
-        layer.canvas.style.opacity = layer.opacity;
-        layer.canvas.style.mixBlendMode = layer.blendMode;
-        layer.canvas.style.display = layer.visible ? "block" : "none";
-        layer.canvas.style.transform = `translate(${Math.round(layer.x)}px, ${Math.round(layer.y)}px)`;
-        if (window.Effects) {
-          Effects.applyToLayer(layer);
-        }
-        this.renderLayersPanel();
-      };
-      img.src = item.dataUrl;
+      // Always clear initialized layer canvas first
+      layer.ctx.clearRect(0, 0, layer.width, layer.height);
+
+      if (item.canvasClone) {
+        // Fast synchronous copy: 0ms latency, zero delay
+        layer.ctx.drawImage(item.canvasClone, 0, 0);
+      } else if (item.dataUrl) {
+        // Fallback async image loading
+        const img = new Image();
+        img.onload = () => {
+          layer.ctx.clearRect(0, 0, layer.width, layer.height);
+          layer.ctx.drawImage(img, 0, 0);
+          layer.canvas.style.opacity = layer.opacity;
+          layer.canvas.style.mixBlendMode = layer.blendMode;
+          layer.canvas.style.display = layer.visible ? "block" : "none";
+          layer.canvas.style.transform = `translate(${Math.round(layer.x)}px, ${Math.round(layer.y)}px)`;
+          if (window.Effects) Effects.applyToLayer(layer);
+          this.renderLayersPanel();
+        };
+        img.src = item.dataUrl;
+      }
+
+      layer.canvas.style.opacity = layer.opacity;
+      layer.canvas.style.mixBlendMode = layer.blendMode;
+      layer.canvas.style.display = layer.visible ? "block" : "none";
+      layer.canvas.style.transform = `translate(${Math.round(layer.x)}px, ${Math.round(layer.y)}px)`;
+      if (window.Effects) {
+        Effects.applyToLayer(layer);
+      }
+
       this.layers.push(layer);
     });
 
+    if (data.activeLayerIndex !== undefined) {
+      this.activeLayerIndex = Math.min(Math.max(0, data.activeLayerIndex), this.layers.length - 1);
+    } else {
+      this.activeLayerIndex = Math.max(0, this.layers.length - 1);
+    }
+
     this.mountToDOM();
     this.renderLayersPanel();
+    this.updateLayerControls();
   }
 };
+
+window.Layer = Layer;
+window.Layers = Layers;

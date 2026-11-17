@@ -33,6 +33,7 @@
             <div class="menu-entry" onclick="App.exportImage('png')"><span class="label" data-i18n="menu_quick_export">Quick Export as PNG</span><span class="shortcut">⌥⇧⌘W</span></div>
             <div class="menu-entry" onclick="App.exportAsDialog()"><span class="label" data-i18n="menu_export_as">Export As...</span><span class="shortcut">⇧⌘S</span></div>
             <div class="menu-divider"></div>
+            <div class="menu-entry" onclick="History.revertToOriginal()"><span class="label" data-i18n="menu_revert">Revert</span><span class="shortcut">F12</span></div>
             <div class="menu-entry" onclick="App.closeDocument()"><span class="label" data-i18n="menu_close">Close</span><span class="shortcut">⌘W</span></div>
           </div>
         </div>
@@ -435,6 +436,7 @@
         <div class="history-footer-actions">
           <button class="layer-action-btn" onclick="History.undo()" data-i18n-title="menu_undo" title="Undo (⌘Z)">↺</button>
           <button class="layer-action-btn" onclick="History.redo()" data-i18n-title="menu_redo" title="Redo (⇧⌘Z)">↻</button>
+          <button class="layer-action-btn" onclick="History.revertToOriginal()" data-i18n-title="menu_revert" title="Revert to Original (F12)">⏮</button>
           <button class="layer-action-btn" onclick="History.clearHistory()" data-i18n-title="history_clear_all" title="Clear History Stack">🧹</button>
           <button class="layer-action-btn" onclick="History.deleteCurrentState()" data-i18n-title="action_delete_state" title="Delete State (⌫)">🗑️</button>
         </div>
@@ -910,7 +912,7 @@
       <div class="modal-body" style="text-align: center; padding: 26px 20px 20px;">
         <img src="assets/icon.png" class="about-logo-big" alt="Piktura Studio">
         <h2 class="about-app-title">Piktura Studio</h2>
-        <div class="about-version-badge">v1.2.1 • Apple Silicon Native</div>
+        <div class="about-version-badge">v1.2.2 • Apple Silicon Native</div>
         <p class="about-tagline-text" data-i18n="about_tagline">Next-Gen Professional Creative Suite</p>
         <div class="about-pills">
           <span class="about-pill">⚡ Metal GPU</span>

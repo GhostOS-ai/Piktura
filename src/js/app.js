@@ -2,7 +2,7 @@
  * Piktura Studio — Core Application Coordinator & Menus
  */
 const App = {
-  version: "1.2.1",
+  version: "1.2.2",
 
   init() {
     I18n.init();
@@ -72,6 +72,15 @@ const App = {
       if ((e.code === "Enter" || e.key === "Enter") && window.Tools && Tools.isCropping) {
         e.preventDefault();
         Tools.applyCrop();
+        return;
+      }
+
+      // F12: Revert document to original state (Photoshop classic)
+      if (e.code === "F12" || e.key === "F12") {
+        e.preventDefault();
+        if (window.History) {
+          History.revertToOriginal();
+        }
         return;
       }
 
